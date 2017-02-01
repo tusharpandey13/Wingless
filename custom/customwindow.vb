@@ -350,6 +350,11 @@ Public Class CustomWindow : Inherits Form
         px(Color.Fuchsia, 0, Height - 1, g)
         px(Color.Fuchsia, Width - 1, Height - 1, g) 'corners
 #End Region
+
+        g.TextRenderingHint = 5
+        g.DrawString(Text, Font, mb(col(100, 0)), 10, 11)
+        g.DrawString(Text, Font, mb(BackColor), 10, 10)
+
         tp.Dispose() : tb.Dispose()
     End Sub
     Protected Overrides Sub OnMouseMove(e As MouseEventArgs)
@@ -392,32 +397,32 @@ Public Class CustomWindow : Inherits Form
         TransparencyKey = Color.Fuchsia
         StartPosition = FormStartPosition.CenterScreen
     End Sub
-    '    Private Sub CustomWindow_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
-    '        e.Cancel = True
-    '        Shadow.Hide()
-    '        Shadow.Visible = False
-    '        Shadow.Dispose()
-    '        For Each c As Control In Controls
-    '            c.Dispose()
-    '        Next
-    '        fxt = 1
+    Private Sub CustomWindow_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
+        e.Cancel = True
+        Shadow.Hide()
+        Shadow.Visible = False
+        Shadow.Dispose()
+        For Each c As Control In Controls
+            c.Dispose()
+        Next
+        fxt = 1
 
 
-    '        '_________________̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲
-    '        'End the process  ͟___________________________________________________̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲ 
-    '        '‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾																													
-    '        Dim PR() As Process = Process.GetProcessesByName("magnify") '            
-    '        For Each Process As Process In PR '                                                    
-    '            On Error GoTo e  '    '                                                                
-    '            Process.Kill() '                                                                                 
-    '        Next '																 ̲ ̲  FUCK YOU MAGNIFYIER ̲͟͟͟͟͟͟͟͟͟͟͟͟͟͟͟͟͟͟͟͟͟͟ ̲̲̲̲ 
-    '        '																	  ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾	 
-    '        '̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅‾̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅‾̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅‾̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅‾̅̅‾̅̅‾̅̅‾̅̅‾̅̅‾̅̅‾̅̅‾̅̅‾̅̅‾̅̅‾̅̅‾̅̅‾̅̅̅ ̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅
+        '_________________̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲
+        'End the process  ͟___________________________________________________̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲ 
+        '‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾																													
+        Dim PR() As Process = Process.GetProcessesByName("magnify") '            
+        For Each Process As Process In PR '                                                    
+            On Error GoTo e  '    '                                                                
+            Process.Kill() '                                                                                 
+        Next '																 ̲ ̲  FUCK YOU MAGNIFYIER ̲͟͟͟͟͟͟͟͟͟͟͟͟͟͟͟͟͟͟͟͟͟͟ ̲̲̲̲ 
+        '																	  ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾	 
+        '̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅‾̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅‾̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅‾̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅‾̅̅‾̅̅‾̅̅‾̅̅‾̅̅‾̅̅‾̅̅‾̅̅‾̅̅‾̅̅‾̅̅‾̅̅‾̅̅̅ ̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅
 
 
-    'e:
-    '        Me.AccessibleDescription = "Animated Form"
-    '    End Sub
+e:
+        Me.AccessibleDescription = "Animated Form"
+    End Sub
 
 #End Region
 

@@ -33,7 +33,7 @@ MustInherit Class customControl
         SetStyle(ControlStyles.AllPaintingInWmPaint Or ControlStyles.OptimizedDoubleBuffer Or ControlStyles.ResizeRedraw Or ControlStyles.UserPaint Or ControlStyles.SupportsTransparentBackColor, True)
 
         _ImageSize = Size.Empty
-        Font = New Font("Calibri", 8S)
+        Font = New Font("Segoe UI", 9S)
 
         upcust()
     End Sub
@@ -1466,9 +1466,11 @@ Module timer
     End Sub
     Public Sub addAnimatedForm(f As Form)
         If Not animatedforms.Contains(f) Then animatedforms.Add(f)
+        startTimer()
     End Sub
     Public Sub addAnimatedcontrol(c As Control)
         If Not animatedcontrols.Contains(c) Then animatedcontrols.Add(c)
+        startTimer()
     End Sub
 
     Sub tck() Handles tmr.Tick
@@ -1542,7 +1544,7 @@ Module Helpers
 
 
 #Region "Color"
-    Friend Function col(a As Byte, r As Byte, g As Byte, b As Byte) As Color
+    Friend Function col(a!, r!, g!, b!)
         Return Color.FromArgb(CByte(CInt(a)), CByte(CInt(r)), CByte(CInt(g)), CByte(CInt(b)))
     End Function
     Friend Function col(r As Byte, g As Byte, b As Byte) As Color
@@ -1618,14 +1620,11 @@ Module Helpers
         Dim y = r * 0.3 + g * 0.59 + b * 0.11
         Return col(a, y)
     End Function
-    Friend Function blendcol(c1 As Color, c2 As Color) As Color
-        Dim r As Integer = 0
-        Dim g As Integer = 0
-        Dim b As Integer = 0
-        r = (c1.R + c2.R) / 2
-        g = CInt(CByte(c1.G + c2.G) / 2)
-        b = CInt(CByte(c1.B + c2.B) / 2)
-        Return col(r, g, b)
+    Friend Function blendcol(fg As Color, bg As Color, Optional ratio! = 0.5) As Color
+
+        Dim ca! = 1 - (1 - fg.A / 255) * (1 - bg.A / 255)
+        If ca < 0.0000001 Then Return col(0, 0)
+        Return Color.FromArgb(CByte(CInt(fg.R * (fg.A / 255) / ca + bg.R * (bg.A / 255) / ca)), CByte(CInt(fg.G * (fg.A / 255) / ca + bg.G * (bg.A / 255) / ca)), CByte(CInt(fg.B * (fg.A / 255) / ca + bg.B * (bg.A / 255) / ca)))
     End Function
 
 #End Region
