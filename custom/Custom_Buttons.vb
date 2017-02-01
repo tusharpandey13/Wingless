@@ -47,7 +47,7 @@ Class custom_Material_Button
         Next
         total = d(bigi) + 2
         isd = 1
-        Me.AccessibleDescription = "Animated Control"
+        animating = True
     End Sub
     Protected Overrides Sub PaintHook()
         Dim gd As Boolean : If rescol(BackColor) = Color.White Then gd = True Else gd = 0
@@ -84,7 +84,7 @@ Class custom_Material_Button
                 t = 0
                 w = 0.0
                 isd = 0
-                If iso = 0 Then Me.AccessibleDescription = "Animated Controll"
+                If iso = 0 Then animating = False
             End If
         End If
 
@@ -94,7 +94,7 @@ Class custom_Material_Button
                 hc = col(GetValue(0, 25, t1, 400, Interpolation.Type.SmoothStep, EasingMethods.Exponent, 0.65), rescol(BackColor))
             Else
                 t1 = 0 : iso = 0
-                If isd = 0 Then Me.AccessibleDescription = "Animated Controll"
+                If isd = 0 Then animating = False
             End If
         ElseIf iso = 2 Then
             If t1 < 250 Then
@@ -102,7 +102,7 @@ Class custom_Material_Button
                 hc = col(GetValue(25, 0, t1, 250, Interpolation.Type.SmoothStep, EasingMethods.Exponent, 0.65), rescol(BackColor))
             Else
                 t1 = 0 : iso = 0
-                If isd = 0 Then Me.AccessibleDescription = "Animated Controll"
+                If isd = 0 Then animating = False
             End If
         End If
 
@@ -113,11 +113,11 @@ Class custom_Material_Button
     Protected Overrides Sub OnMouseEnter(e As EventArgs)
         MyBase.OnMouseEnter(e)
         iso = 1
-        Me.AccessibleDescription = "Animated Control"
+        animating = True
     End Sub
     Protected Overrides Sub OnMouseLeave(e As EventArgs)
         If Not hc.A = 0 Then iso = 2
-        Me.AccessibleDescription = "Animated Control"
+        animating = True
     End Sub
 End Class
 
@@ -149,7 +149,7 @@ Class CustomButton : Inherits customControl
 #End Region
 #Region "fn"
     Protected Overrides Sub PaintHook()
-        If Me.AccessibleDescription = "Animated Control" Then calc()
+        If animatedcontrols.Contains(Me) Then calc()
         G.Clear(Parent.BackColor)
         If DesignMode Then G.InterpolationMode = 7 : G.DrawImageUnscaled(retbit(), 0, 0)
         G.InterpolationMode = 7
@@ -166,7 +166,7 @@ Class CustomButton : Inherits customControl
             t = 0
             'sx = 1 : sy = 1
             'tx = 0 : ty = 0
-            Me.AccessibleDescription = ""
+            animating = False
         End If
     End Sub
 #End Region
@@ -260,12 +260,12 @@ Class CustomButton : Inherits customControl
     Protected Overrides Sub OnMouseDown(e As MouseEventArgs)
         MyBase.OnMouseDown(e)
         ms = 2
-        Me.AccessibleDescription = "Animated Control"
+        animating = True
     End Sub
     Protected Overrides Sub OnMouseUp(e As MouseEventArgs)
         MyBase.OnMouseUp(e)
         ms = 0
-        Me.AccessibleDescription = "Animated Control"
+        animating = True
     End Sub
     Protected Overrides Sub OnMouseMove(e As MouseEventArgs)
         MyBase.OnMouseMove(e)
@@ -276,7 +276,7 @@ Class CustomButton : Inherits customControl
     Protected Overrides Sub OnMouseLeave(e As EventArgs)
         MyBase.OnMouseLeave(e)
         ms = 0
-        Me.AccessibleDescription = "Animated Control"
+        animating = True
     End Sub
     Protected Overrides Sub OnMouseEnter(e As EventArgs)
         MyBase.OnMouseEnter(e)

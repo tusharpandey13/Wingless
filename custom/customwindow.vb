@@ -13,6 +13,7 @@ Public Class CustomWindow : Inherits Form
     Dim fxt% = 0
     Dim cbx% = 0
     Dim ms% = 0
+    Public Property animating As Boolean = 0
     Public ReadOnly Property designing As Boolean
         Get
             Return DesignMode
@@ -361,7 +362,7 @@ Public Class CustomWindow : Inherits Form
         ms = 1
         MyBase.OnMouseMove(e)
         For Each c As Control In Controls
-            On Error Resume Next : DirectCast(c, customControl).leavemouse(e)
+            'On Error Resume Next : DirectCast(c, customControl).leavemouse(e)
         Next
         Dim r = Width - 99 - BorderWidth / 2
         If e.X > r And e.X < Width - BorderWidth / 2 And e.Y < 34 And e.Y > 0 Then
@@ -387,7 +388,6 @@ Public Class CustomWindow : Inherits Form
         Else
             Shadow.BackColor = Color.Black
             Shadow.Visible = 1
-            startTimer()
             FormBorderStyle = FormBorderStyle.Sizable
             fxt = 0
             Top = (Screen.PrimaryScreen.WorkingArea.Height - Height)
@@ -397,33 +397,37 @@ Public Class CustomWindow : Inherits Form
         TransparencyKey = Color.Fuchsia
         StartPosition = FormStartPosition.CenterScreen
     End Sub
-    Private Sub CustomWindow_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
-        e.Cancel = True
-        Shadow.Hide()
-        Shadow.Visible = False
-        Shadow.Dispose()
-        For Each c As Control In Controls
-            c.Dispose()
-        Next
-        fxt = 1
+    '    Private Sub CustomWindow_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
+    '        e.Cancel = True
+    '        Shadow.Hide()
+    '        Shadow.Visible = False
+    '        Shadow.Dispose()
+    '        For Each c As Control In Controls
+    '            c.Dispose()
+    '        Next
+    '        fxt = 1
 
 
-        '_________________̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲
-        'End the process  ͟___________________________________________________̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲ 
-        '‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾																													
-        Dim PR() As Process = Process.GetProcessesByName("magnify") '            
-        For Each Process As Process In PR '                                                    
-            On Error GoTo e  '    '                                                                
-            Process.Kill() '                                                                                 
-        Next '																 ̲ ̲  FUCK YOU MAGNIFYIER ̲͟͟͟͟͟͟͟͟͟͟͟͟͟͟͟͟͟͟͟͟͟͟ ̲̲̲̲ 
-        '																	  ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾	 
-        '̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅‾̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅‾̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅‾̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅‾̅̅‾̅̅‾̅̅‾̅̅‾̅̅‾̅̅‾̅̅‾̅̅‾̅̅‾̅̅‾̅̅‾̅̅‾̅̅̅ ̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅
+    '        '_________________̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲
+    '        'End the process  ͟___________________________________________________̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲ 
+    '        '‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾																													
+    '        Dim PR() As Process = Process.GetProcessesByName("magnify") '            
+    '        For Each Process As Process In PR '                                                    
+    '            On Error GoTo e  '    '                                                                
+    '            Process.Kill() '                                                                                 
+    '        Next '																 ̲ ̲  FUCK YOU MAGNIFYIER ̲͟͟͟͟͟͟͟͟͟͟͟͟͟͟͟͟͟͟͟͟͟͟ ̲̲̲̲ 
+    '        '																	  ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾	 
+    '        '̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅‾̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅‾̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅‾̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅‾̅̅‾̅̅‾̅̅‾̅̅‾̅̅‾̅̅‾̅̅‾̅̅‾̅̅‾̅̅‾̅̅‾̅̅‾̅̅̅ ̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅
 
 
-e:
-        Me.AccessibleDescription = "Animated Form"
+    'e:
+    '        Me.AccessibleDescription = "Animated Form"
+    '    End Sub
+    Protected Overrides Sub Dispose(disposing As Boolean)
+        MyBase.Dispose(disposing)
+        animatedforms.Remove(Me)
+        If animatedforms.Count = 0 Then stopTimer()
     End Sub
-
 #End Region
 
 #Region "SHADOW"
@@ -1411,7 +1415,7 @@ End Class ' DISPOSE done
 ''            op = Opacity
 ''            ot += 1
 ''        Else
-''            AccessibleDescription = ""
+''            animating=false
 ''            Opacity = 1
 ''            op = 1.0#
 ''            fxt = -1
@@ -1428,7 +1432,7 @@ End Class ' DISPOSE done
 '            op = Opacity
 '            ot += 1
 '        Else
-'            AccessibleDescription = ""
+'            animating=false
 '            Opacity = 0
 '            op = 0.0#
 '            fxt = -1

@@ -20,6 +20,7 @@ Imports System.Runtime.InteropServices
 #End Region
 
 
+
 #Region "Themebase"
 MustInherit Class customControl
     Inherits Control
@@ -46,6 +47,8 @@ MustInherit Class customControl
         Transparent = _Transparent
         If _Transparent AndAlso _BackColor Then BackColor = Color.Transparent
 
+        addAnimatedcontrol(Me)
+
         MyBase.OnHandleCreated(e)
     End Sub
 
@@ -53,8 +56,7 @@ MustInherit Class customControl
     Protected NotOverridable Overrides Sub OnParentChanged(ByVal e As EventArgs)
         If Parent IsNot Nothing Then
             OnCreation()
-            animatedcontrols.Add(Me)
-            startTimer()
+
             DoneCreation = True
             upcust()
         End If
@@ -205,6 +207,12 @@ MustInherit Class customControl
 
 #Region " Public Properties "
 
+    Public ReadOnly Property designing As Boolean
+        Get
+            Return DesignMode
+        End Get
+    End Property
+    Public Property animating As Boolean
 
 
     Private _Image As Image
@@ -498,6 +506,11 @@ MustInherit Class customControl
     End Enum
 #End Region
 
+    Protected Overrides Sub Dispose(disposing As Boolean)
+        MyBase.Dispose(disposing)
+        animatedcontrols.Remove(Me)
+    End Sub
+
 
 #Region "Animation"
     Private Function GetValue(StartV#, EndV#, Time#, Duration#, IType As Type, Method As EasingMethods, Power#, Q#, R#) As Single
@@ -538,6 +551,7 @@ MustInherit Class customControl
 #End Region
 End Class
 #End Region
+
 
 
 Class Interpolation
@@ -733,6 +747,7 @@ Class Interpolation
     End Function
 
 End Class
+
 
 
 #Region "Multitmedia Timer"
@@ -1357,6 +1372,7 @@ End Namespace
 #End Region
 
 
+
 Public Class BitBliter
     'by Fade (Amit BS) [codeproject]
 #Region " BitBlt Declaration"
@@ -1447,65 +1463,77 @@ Public Class BitBliter
 #End Region
 End Class
 
+
+
 Module timer
-    Dim hasTimerStarted As Boolean = 0
+    Public hasTimerStarted As Boolean = 0
     Public T% = 0
-    Private WithEvents tmr As New Multimedia.Timer With {.Period = 1, .Resolution = 1, .Mode = 1}
+    Private WithEvents tmr As Multimedia.Timer
     Friend animatedforms As New List(Of Form)
-    Friend animatedcontrols As New List(Of Control)
+    Friend animatedcontrols As New List(Of customControl)
+    Public indesignmode As Boolean = 0
 
     Public Sub startTimer()
-        If Not hasTimerStarted Then
+        If hasTimerStarted = 0 Then
+            tmr = New Multimedia.Timer With {.Period = 1, .Resolution = 1, .Mode = 1}
             tmr.Start()
             hasTimerStarted = 1
         End If
     End Sub
-    Public Sub stopTime()
+    Public Sub stopTimer()
+        If hasTimerStarted = 0 Then Return
         tmr.Stop()
         hasTimerStarted = 0
+        tmr.Dispose()
     End Sub
     Public Sub addAnimatedForm(f As Form)
         If Not animatedforms.Contains(f) Then animatedforms.Add(f)
+        If TypeOf f Is CustomWindow And DirectCast(f, CustomWindow).designing = True Then
+            indesignmode = 1
+            Return
+        End If
         startTimer()
     End Sub
     Public Sub addAnimatedcontrol(c As Control)
         If Not animatedcontrols.Contains(c) Then animatedcontrols.Add(c)
+        If TypeOf c Is customControl Then
+            If DirectCast(c, customControl).designing Then
+                indesignmode = 1
+                Return
+            End If
+        End If
         startTimer()
     End Sub
+    Public Sub removeAnimatedControl(c As Control)
+        If animatedcontrols.Contains(c) Then animatedcontrols.Remove(c)
+        If animatedcontrols.Count = 0 And animatedforms.Count = 0 Then stopTimer()
+    End Sub
+    Public Sub removeAnimatedform(c As Form)
+        If animatedforms.Contains(c) Then animatedforms.Remove(c)
+        If animatedcontrols.Count = 0 And animatedforms.Count = 0 Then stopTimer()
+    End Sub
+    Async Sub inv(c As Control)
+        c.Invalidate()
+    End Sub
+    Async Sub tck() Handles tmr.Tick
+        If indesignmode = 1 Then Return
+        If T >= 1000 Then T = 0
 
-    Sub tck() Handles tmr.Tick
-        If T >= 25000 Then T = 0
         For Each f As Form In animatedforms
-            If TypeOf f Is CustomWindow And DirectCast(f, CustomWindow).designing = True Then Return
+            If DirectCast(f, CustomWindow).animating Then f.Invalidate()
             If f.AccessibleDescription = "Animated Form" Then f.Invalidate()
         Next
 
-        For Each c As Control In animatedcontrols
-            If c.AccessibleDescription = "Animated Control" Then c.Invalidate()
-            If c.AccessibleDescription = "AnimateOnce" Then
-                c.Invalidate()
-                c.AccessibleDescription = ""
-            End If
-            If TypeOf c Is Panel Or c.AccessibleDescription = "AnimateContents" Then invcon(c)
-            If TypeOf c Is Panel Or c.AccessibleDescription = "Animated Control AnimateContents" Then
-                c.Invalidate()
-                invcon(c)
-            End If
+        For Each c As customControl In animatedcontrols
+            If c.animating Then inv(c)
+            'If c.AccessibleDescription = "AnimateOnce" Then c.animating=false
         Next
         T += 1
     End Sub
-    Sub invcon(pc As Control)
-        For Each c As Control In pc.Controls
-            If c.AccessibleDescription = "Animated Control" Then c.Invalidate()
-            If TypeOf c Is Panel Or c.AccessibleDescription = "AnimateContents" Then invcon(c)
-            If TypeOf c Is Panel Or c.AccessibleDescription = "Animated Control AnimateContents" Then
-                c.Invalidate()
-                invcon(c)
-            End If
-        Next
-    End Sub
 
 End Module
+
+
 
 Module Helpers
 
@@ -1544,7 +1572,7 @@ Module Helpers
 
 
 #Region "Color"
-    Friend Function col(a!, r!, g!, b!)
+    Friend Function col(a!, r!, g!, b!) As Color
         Return Color.FromArgb(CByte(CInt(a)), CByte(CInt(r)), CByte(CInt(g)), CByte(CInt(b)))
     End Function
     Friend Function col(r As Byte, g As Byte, b As Byte) As Color
@@ -1556,10 +1584,10 @@ Module Helpers
     Friend Function col(a As Byte, br As SolidBrush) As Color
         Return Color.FromArgb(CByte(CInt(a)), br.Color)
     End Function
-    Friend Function col(c As Color, sat!)
+    Friend Function col(c As Color, sat!) As Color
         Return Color.FromArgb(CByte(CInt(c.A)), CByte(Math.Min(255, Math.Max(0, CInt(c.R) * sat))), CByte(Math.Min(255, Math.Max(0, CInt(c.G) * sat))), CByte(Math.Min(255, Math.Max(0, CInt(c.B) * sat))))
     End Function
-    Friend Function col(c As Color, sat!, limit As Color, l As LimitingType)
+    Friend Function col(c As Color, sat!, limit As Color, l As LimitingType) As Color
         Dim floor, ceil As Color
         If l = LimitingType.NotLessThan Then
             floor = limit
@@ -1620,11 +1648,8 @@ Module Helpers
         Dim y = r * 0.3 + g * 0.59 + b * 0.11
         Return col(a, y)
     End Function
-    Friend Function blendcol(fg As Color, bg As Color, Optional ratio! = 0.5) As Color
-
-        Dim ca! = 1 - (1 - fg.A / 255) * (1 - bg.A / 255)
-        If ca < 0.0000001 Then Return col(0, 0)
-        Return Color.FromArgb(CByte(CInt(fg.R * (fg.A / 255) / ca + bg.R * (bg.A / 255) / ca)), CByte(CInt(fg.G * (fg.A / 255) / ca + bg.G * (bg.A / 255) / ca)), CByte(CInt(fg.B * (fg.A / 255) / ca + bg.B * (bg.A / 255) / ca)))
+    Friend Function blendcol(c1 As Color, c2 As Color, Optional r! = 0.5) As Color
+        Return col(CByte(CInt(c1.R) * r + CInt(c2.R) * (1 - r)), CByte(CInt(c1.G) * r + CInt(c2.G) * (1 - r)), CByte(CInt(c1.B) * r + CInt(c2.B) * (1 - r)))
     End Function
 
 #End Region
@@ -1899,5 +1924,4 @@ Module Helpers
 #End Region
 
 End Module
-
 #End Region

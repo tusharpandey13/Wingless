@@ -29,7 +29,7 @@ Class customcontrolbox
 
 #Region "Variables"
     Public l As Integer = 3
-	'Public s As MouseState
+    'Public s As MouseState
     Dim c As Color
     Dim p As Pen
     Dim gb As LinearGradientBrush
@@ -41,7 +41,7 @@ Class customcontrolbox
 
 #Region "Settings"
     Sub New()
-		SetStyle(ControlStyles.ResizeRedraw Or ControlStyles.AllPaintingInWmPaint Or ControlStyles.OptimizedDoubleBuffer Or ControlStyles.ResizeRedraw Or ControlStyles.UserPaint, True)
+        SetStyle(ControlStyles.ResizeRedraw Or ControlStyles.AllPaintingInWmPaint Or ControlStyles.OptimizedDoubleBuffer Or ControlStyles.ResizeRedraw Or ControlStyles.UserPaint, True)
         DoubleBuffered = True
         Anchor = AnchorStyles.Top Or AnchorStyles.Right
         LockHeight = 33
@@ -58,7 +58,7 @@ Class customcontrolbox
 
 
         g = Graphics.FromImage(minb)
-		g.CompositingQuality = 2
+        g.CompositingQuality = 2
         g.InterpolationMode = 7
 
 
@@ -417,98 +417,98 @@ Class customcontrolbox
         G.CompositingQuality = 4
         G.InterpolationMode = 7
 
-		Select Case State
-			Case MouseState.Over
-				'MsgBox("fe")
-				G.FillRectangle(New SolidBrush(col(25, rescol(Parent.ForeColor))), x, 0, 34, Height)
-			Case MouseState.Down
-				G.FillRectangle(New SolidBrush(col(35, ForeColor)), x, 0, 34, Height)
-		End Select
+        Select Case State
+            Case MouseState.Over
+                'MsgBox("fe")
+                G.FillRectangle(New SolidBrush(col(25, rescol(Parent.ForeColor))), x, 0, 34, Height)
+            Case MouseState.Down
+                G.FillRectangle(New SolidBrush(col(35, ForeColor)), x, 0, 34, Height)
+        End Select
 
-		If rescol(BackColor).R = 255 Then 'dark
-			'Minimize;
-			G.DrawImageUnscaled(minb, 0, 0)
-			'Maximize and Restore;
-			If Parent.FindForm.WindowState = FormWindowState.Normal Then G.DrawImageUnscaled(mb, 0, 0) Else G.DrawImageUnscaled(rb, 0, 0)
+        If rescol(BackColor).R = 255 Then 'dark
+            'Minimize;
+            G.DrawImageUnscaled(minb, 0, 0)
+            'Maximize and Restore;
+            If Parent.FindForm.WindowState = FormWindowState.Normal Then G.DrawImageUnscaled(mb, 0, 0) Else G.DrawImageUnscaled(rb, 0, 0)
 
-			'Close;
-			G.DrawImageUnscaled(cb, 0, 0)
-		Else
-			'Minimize;
-			G.DrawImageUnscaled(minbl, 0, 0)
-			'Maximize and Restore;
-			If Parent.FindForm.WindowState = FormWindowState.Normal Then G.DrawImageUnscaled(mbl, 0, 0) Else G.DrawImageUnscaled(rbl, 0, 0)
+            'Close;
+            G.DrawImageUnscaled(cb, 0, 0)
+        Else
+            'Minimize;
+            G.DrawImageUnscaled(minbl, 0, 0)
+            'Maximize and Restore;
+            If Parent.FindForm.WindowState = FormWindowState.Normal Then G.DrawImageUnscaled(mbl, 0, 0) Else G.DrawImageUnscaled(rbl, 0, 0)
 
-			'Close;
-			G.DrawImageUnscaled(cbl, 0, 0)
-		End If
+            'Close;
+            G.DrawImageUnscaled(cbl, 0, 0)
+        End If
 
-		'Get rid of the Pen and GradientBrush;
-		p.Dispose()
-		gb.Dispose()
+        'Get rid of the Pen and GradientBrush;
+        p.Dispose()
+        gb.Dispose()
 
-	End Sub
+    End Sub
 
 
 #Region "Calculate Mouse State"
 
-	Protected Overrides Sub OnMouseMove(e As MouseEventArgs)
-		MyBase.OnMouseMove(e)
-		State = MouseState.Over
-		If e.X > 0 And e.X < 34 Then
-			l = 0
-			x = 0
-		ElseIf e.X > 34 And e.X < 68 Then
-			l = 1
-			x = 35
-		ElseIf e.X > 68 Then
-			l = 2
-			x = 69
-		Else
-			l = 3
-			x = -1000
-		End If
-		Invalidate()
-		'Parent.Invalidate()
-	End Sub
+    Protected Overrides Sub OnMouseMove(e As MouseEventArgs)
+        MyBase.OnMouseMove(e)
+        State = MouseState.Over
+        If e.X > 0 And e.X < 34 Then
+            l = 0
+            x = 0
+        ElseIf e.X > 34 And e.X < 68 Then
+            l = 1
+            x = 35
+        ElseIf e.X > 68 Then
+            l = 2
+            x = 69
+        Else
+            l = 3
+            x = -1000
+        End If
+        Invalidate()
+        'Parent.Invalidate()
+    End Sub
 
-	Protected Overrides Sub OnMouseUp(e As MouseEventArgs)
-		MyBase.OnMouseUp(e)
-		l = 3
-		State = MouseState.None
-		Invalidate()
-		'Parent.Invalidate()
-	End Sub
+    Protected Overrides Sub OnMouseUp(e As MouseEventArgs)
+        MyBase.OnMouseUp(e)
+        l = 3
+        State = MouseState.None
+        Invalidate()
+        'Parent.Invalidate()
+    End Sub
 
-	Protected Overrides Sub OnMouseLeave(e As EventArgs)
-		MyBase.OnMouseLeave(e)
-		l = 3
-		State = MouseState.None
-		Invalidate()
-		'Parent.Invalidate()
-	End Sub
+    Protected Overrides Sub OnMouseLeave(e As EventArgs)
+        MyBase.OnMouseLeave(e)
+        l = 3
+        State = MouseState.None
+        Invalidate()
+        'Parent.Invalidate()
+    End Sub
 
 #End Region
 
 #Region "Button Click Actions"
 
-	Protected Overrides Sub OnClick(e As EventArgs)
-		MyBase.OnClick(e)
-		State = MouseState.Down
-		Select Case l
-			Case 0
-				FindForm.WindowState = FormWindowState.Minimized
-			Case 1
-				If FindForm.WindowState = FormWindowState.Normal Then
-					FindForm.WindowState = FormWindowState.Maximized
-				ElseIf FindForm.WindowState = FormWindowState.Maximized Then
-					FindForm.WindowState = FormWindowState.Normal
-				End If
-			Case 2
-				FindForm.Close()
-			Case Else
-		End Select
-	End Sub
+    Protected Overrides Sub OnClick(e As EventArgs)
+        MyBase.OnClick(e)
+        State = MouseState.Down
+        Select Case l
+            Case 0
+                FindForm.WindowState = FormWindowState.Minimized
+            Case 1
+                If FindForm.WindowState = FormWindowState.Normal Then
+                    FindForm.WindowState = FormWindowState.Maximized
+                ElseIf FindForm.WindowState = FormWindowState.Maximized Then
+                    FindForm.WindowState = FormWindowState.Normal
+                End If
+            Case 2
+                FindForm.Close()
+            Case Else
+        End Select
+    End Sub
 
 #End Region
 

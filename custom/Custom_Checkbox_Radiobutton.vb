@@ -119,7 +119,7 @@ End Class 'DISPOSE LEFT
                 ix = 0 : iy = 0
             End If
             invalidatecontrols()
-            AccessibleDescription = "Animated Control"
+            animating = True
         End Set
     End Property
 
@@ -137,7 +137,7 @@ End Class 'DISPOSE LEFT
             LGB = New LinearGradientBrush(New Rectangle(0, 0, 64, 64), col(51, rescol(Parent.BackColor)), col(75, rescol(Parent.BackColor)), 90.0F)
             .FillEllipse(LGB, 0, 0, 60, 60)
             ' .DrawArc(New Pen(col(255, Color.Black)), 0, 8, 60, 60, -180, 180)
-            .DrawArc(New Pen(col(160, Invert(rescol(Parent.BackColor)))), 0, 0, 60, 60, 0, 360)
+            .DrawArc(New Pen(col(160, invert(rescol(Parent.BackColor)))), 0, 0, 60, 60, 0, 360)
         End With
         With Graphics.FromImage(rdb)
             .SmoothingMode = 2 : .InterpolationMode = 7
@@ -169,7 +169,7 @@ End Class 'DISPOSE LEFT
             t += 1
             x = GetValue(ix, fx, t, 300, Interpolation.Type.Smootherstep, 1)
             y = GetValue(iy, fy, t, 300, Interpolation.Type.Smootherstep, 1)
-        Else : AccessibleDescription = " "
+        Else : animating = False
         End If
     End Sub
 
@@ -178,7 +178,7 @@ End Class 'DISPOSE LEFT
         t = 0
         invalidatecontrols()
         Checked = True
-        AccessibleDescription = "Animated Control"
+        animating = True
 
     End Sub
     Sub invalidatecontrols()
@@ -203,7 +203,7 @@ End Class 'DISPOSE LEFT
 
                 DirectCast(c, customRadio).t = 0
                 DirectCast(c, customRadio).Checked = False
-                DirectCast(c, customRadio).AccessibleDescription = "Animated Control"
+                addAnimatedcontrol(DirectCast(c, customRadio))
             End If
         Next
     End Sub
@@ -227,7 +227,7 @@ End Class
             If _Checked Then fd = 1 Else fd = 0
             If fd = 1 Then hb = hb2 Else hb = hb1
             RaiseEvent CheckedChanged()
-            If Not DesignMode Then AccessibleDescription = "Animated Control"
+            If Not DesignMode Then animating = True
         End Set
     End Property
     Private _fc As Color = col(0, 120, 204) : <Browsable(True), EditorBrowsable(EditorBrowsableState.Always), DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)> Overrides Property ForeColor() As Color
@@ -236,7 +236,7 @@ End Class
         End Get
         Set(ByVal value As Color)
             _fc = value
-            AccessibleDescription = ""
+            animating = False
             paintbits(0, hb1)
             paintbits(1, hb2)
             If fd = 1 Then hb = hb2 Else hb = hb1
@@ -292,7 +292,7 @@ End Class
         MyBase.OnMouseMove(e)
         If mdown Then
             t = 0
-            Me.AccessibleDescription = ""
+            animating = False
             x = Max(0, Min(22, e.X)) - tx
             If x - 9 > 20 AndAlso fd = 0 Then
                 fd = 1
@@ -322,12 +322,12 @@ End Class
         Invalidate()
     End Sub
     Private Sub animlogic()
-        If Not AccessibleDescription = "Animated Control" Then Exit Sub
+        If Not animatedcontrols.Contains(Me) Then Exit Sub
         If t < 500 Then
             x = GetValue(x, fd * (Width - 18), t, 500, Interpolation.Type.EaseInOut, Interpolation.EasingMethods.Regular, 5)
             t += 1
         Else
-            AccessibleDescription = ""
+            animating = False
             t = 0
         End If
     End Sub
@@ -390,7 +390,7 @@ End Class
     Sub New()
         SetStyle(ControlStyles.ResizeRedraw, True)
         LockHeight = 30
-        AccessibleDescription = "AnimateContents"
+        ' Me.AccessibleDescription = "AnimateContents"
         Font = New Font("Segoe UI", 9)
     End Sub
     Protected Overrides Sub OnCreateControl()

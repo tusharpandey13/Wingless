@@ -234,7 +234,7 @@ Imports System.ComponentModel
 '        SetColor("Border1", 0, 120, 204)
 '        IsAnimated = True
 
-'        Me.AccessibleDescription = "Animated Control"
+'        animating=true
 '    End Sub
 
 'End Class 'DISPOSE LEFT
@@ -415,7 +415,7 @@ Imports System.ComponentModel
             w1 = ((w1 * (100 - 1)) + (Width - x)) / 100 'wid-x                   <-------= SAVE THIS
             w2 = ((w2 * (100 - 1)) + x) / 100   'x
         Else
-            Me.AccessibleDescription = ""
+            animating = False
         End If ' anim
 
         mb(bc, tb)
@@ -467,7 +467,7 @@ Imports System.ComponentModel
 
     End Sub
     Public Sub md(sender As Object, e As MouseEventArgs)
-        Me.AccessibleDescription = "Animated Control"
+        animating = True
         x = e.X
         isf = 1
     End Sub

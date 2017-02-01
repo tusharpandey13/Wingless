@@ -127,7 +127,7 @@ Imports System.Drawing.Imaging
 
         End If
         RaiseEvent ClickedForward()
-        Me.AccessibleDescription = "Animated Control"
+        animating = True
 
     End Sub
 

@@ -106,13 +106,13 @@ Class customLinearProgress
     Inherits customControl
 
 #Region "global"
-    Private _Maximum As Double = 100
-    Private _Value As Double = 0
-    Private pw As Integer
-    Private hoff As Double
+    Private _Maximum! = 100
+    Private _Value! = 0
+    Private pw!
+    Private hoff!
     Dim rev As Boolean
-    Dim op As Double = 2
-    Dim hz As Integer
+    Dim op! = 2
+    Dim hz!
     Private O As _Options
     Private t As _type
 #End Region
@@ -138,16 +138,16 @@ Class customLinearProgress
         Maximum = 100
         Value = 0
         If O = _Options.Simple Then LockHeight = 10
-        AccessibleDescription = "Animated Control"
+        animating = True
     End Sub
 
 
     <Category("Behavior")>
-    Public Property Maximum As Integer
+    Public Property Maximum!
         Get
             Return _Maximum
         End Get
-        Set(ByVal V As Integer)
+        Set(ByVal V!)
             If V < 1 Then V = 1
             If V < _Value Then _Value = V
             _Maximum = V
@@ -155,11 +155,11 @@ Class customLinearProgress
         End Set
     End Property
     <Category("Behavior")>
-    Public Property Value As Double
+    Public Property Value!
         Get
             Return _Value#
         End Get
-        Set(ByVal V As Double)
+        Set(ByVal V!)
             If V > _Maximum Then
                 _Value = _Maximum
             End If
@@ -217,12 +217,6 @@ Class customLinearProgress
 #Region "draw"
 
     Protected Overrides Sub PaintHook()
-        If ctr > 1.5 Then ctr = -1.6 Else ctr += 0.01
-        If rev = False Then
-            If op < 81 Then op += 0.1 Else rev = True
-        Else
-            If op > 10 Then op -= 0.1 Else rev = False
-        End If
         If hoff >= hz Then hoff = 0
         hoff += 0.08
 
@@ -376,7 +370,6 @@ Class customLinearProgress
         'G.DrawString(x, Font, Brushes.Gray, New Point(Width / 2, Height - 15))
         bf.Dispose()
     End Sub
-    Dim ctr As Double = 0.0
 
 #End Region
 
@@ -392,7 +385,7 @@ Class customCircularMarquee
         UpdateStyles()
         DoubleBuffered = True
         Size = New Size(200, 200)
-        AccessibleDescription = "Animated Control"
+        animating = True
     End Sub
     Protected Overrides Sub PaintHook()
         G.SmoothingMode = 2 : G.InterpolationMode = 7
