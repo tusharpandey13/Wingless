@@ -1,8 +1,8 @@
 ﻿Imports System.Runtime.InteropServices
 Imports System.Drawing.Drawing2D
+Imports WindowsApplication3
 
-
-Public Class CustomWindow : Inherits Form
+Public Class CustomWindow : Inherits Form : Implements AnimatedObject
 
 
 #Region "DECLARE"
@@ -13,11 +13,19 @@ Public Class CustomWindow : Inherits Form
     Dim fxt% = 0
     Dim cbx% = 0
     Dim ms% = 0
-    Public Property animating As Boolean = 0
-    Public ReadOnly Property designing As Boolean
+    Public Property animating As Boolean = 0 Implements AnimatedObject.animating
+    Public ReadOnly Property designing As Boolean Implements AnimatedObject.designing
         Get
             Return DesignMode
         End Get
+    End Property
+    Private Property custom_AccessibleDescription As String Implements AnimatedObject.AccessibleDescription
+        Get
+            Return Me.AccessibleDescription
+        End Get
+        Set(value As String)
+            Me.AccessibleDescription = value
+        End Set
     End Property
 #End Region
 
@@ -377,7 +385,12 @@ Public Class CustomWindow : Inherits Form
         MyBase.OnResize(e)
         cbx = 0
     End Sub
-
+    Public Sub leavemouse(e As EventArgs) Implements AnimatedObject.leavemouse
+        Me.OnMouseLeave(e)
+    End Sub
+    Private Sub custom_invalidate() Implements AnimatedObject.invalidate
+        Invalidate()
+    End Sub
 #End Region
 
 #Region "FORM LOADING and CLOSING"
@@ -425,8 +438,8 @@ Public Class CustomWindow : Inherits Form
     '    End Sub
     Protected Overrides Sub Dispose(disposing As Boolean)
         MyBase.Dispose(disposing)
-        animatedforms.Remove(Me)
-        If animatedforms.Count = 0 Then stopTimer()
+        'animatedforms.Remove(Me)
+        'If animatedforms.Count = 0 Then stopTimer()
     End Sub
 #End Region
 
@@ -917,6 +930,7 @@ Public Class CustomWindow : Inherits Form
         MyBase.OnCreateControl()
 
     End Sub
+
 #End Region
 
 

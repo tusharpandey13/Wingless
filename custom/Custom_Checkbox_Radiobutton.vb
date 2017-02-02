@@ -203,7 +203,7 @@ End Class 'DISPOSE LEFT
 
                 DirectCast(c, customRadio).t = 0
                 DirectCast(c, customRadio).Checked = False
-                addAnimatedcontrol(DirectCast(c, customRadio))
+                addAnimatedobject(DirectCast(c, customRadio))
             End If
         Next
     End Sub
@@ -322,7 +322,7 @@ End Class
         Invalidate()
     End Sub
     Private Sub animlogic()
-        If Not animatedcontrols.Contains(Me) Then Exit Sub
+        If Not animating Then Exit Sub
         If t < 500 Then
             x = GetValue(x, fd * (Width - 18), t, 500, Interpolation.Type.EaseInOut, Interpolation.EasingMethods.Regular, 5)
             t += 1

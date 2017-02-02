@@ -134,7 +134,7 @@ Class custom_Numeric : Inherits customControl
         Dim dst!
         If sd = -1 Then dst = 30
         If sd = 1 Then dst = -30
-        If t < 500 And animatedcontrols.Contains(Me) Then
+        If t < 500 And animating then
             ofst = GetValue(0, dst, t, 500, Interpolation.Type.SmoothStep, 2)
         Else
             animating = False

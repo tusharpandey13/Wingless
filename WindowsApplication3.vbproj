@@ -107,7 +107,6 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="custom\Interpolation.vb" />
-    <Compile Include="custom\MultimedaTimer.vb" />
     <Compile Include="custom\Themebase.vb">
       <SubType>Component</SubType>
     </Compile>

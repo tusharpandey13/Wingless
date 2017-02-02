@@ -1,14 +1,14 @@
 ﻿#Region "Imports"
 Imports System.Drawing.Drawing2D
 Imports System.ComponentModel
+Imports WindowsApplication3
 #End Region
-
 
 
 #Region "Themebase"
 MustInherit Class customControl
     Inherits Control
-
+    Implements AnimatedObject
 
 #Region " Initialization "
 
@@ -31,7 +31,7 @@ MustInherit Class customControl
         Transparent = _Transparent
         If _Transparent AndAlso _BackColor Then BackColor = Color.Transparent
 
-        addAnimatedcontrol(Me)
+        addAnimatedobject(Me)
 
         MyBase.OnHandleCreated(e)
     End Sub
@@ -102,7 +102,7 @@ MustInherit Class customControl
         Next
         MyBase.OnMouseEnter(e)
     End Sub
-    Public Sub leavemouse(e As EventArgs)
+    Public Sub leavemouse(e As EventArgs) Implements AnimatedObject.leavemouse
         OnMouseLeave(e)
     End Sub
     Protected Overrides Sub OnMouseUp(ByVal e As MouseEventArgs)
@@ -190,15 +190,6 @@ MustInherit Class customControl
 #End Region
 
 #Region " Public Properties "
-
-    Public ReadOnly Property designing As Boolean
-        Get
-            Return DesignMode
-        End Get
-    End Property
-    Public Property animating As Boolean
-
-
     Private _Image As Image
     Property Image() As Image
         Get
@@ -300,7 +291,26 @@ MustInherit Class customControl
     End Property
 
 
+
 #End Region
+
+
+    Public ReadOnly Property designing As Boolean Implements AnimatedObject.designing
+        Get
+            Return DesignMode
+        End Get
+    End Property
+
+    Public Property animating As Boolean Implements AnimatedObject.animating
+
+    Private Overloads Property custom_AccessibleDescription As String Implements AnimatedObject.AccessibleDescription
+        Get
+            Return Me.AccessibleDescription
+        End Get
+        Set(value As String)
+            Me.AccessibleDescription = value
+        End Set
+    End Property
 
 
 #Region " Property Helpers "
@@ -492,7 +502,7 @@ MustInherit Class customControl
 
     Protected Overrides Sub Dispose(disposing As Boolean)
         MyBase.Dispose(disposing)
-        animatedcontrols.Remove(Me)
+        removeAnimatedobject(Me)
     End Sub
 
 
@@ -532,7 +542,20 @@ MustInherit Class customControl
         c = Color.FromArgb(a, r, g, b)
         Return c
     End Function
+
+    Private Sub custom_invalidate() Implements AnimatedObject.invalidate
+        Invalidate()
+    End Sub
 #End Region
 End Class
 #End Region
 
+
+Public Interface AnimatedObject
+    ReadOnly Property designing As Boolean
+    Property animating As Boolean
+    Sub leavemouse(e As EventArgs)
+
+    Sub invalidate()
+    Property AccessibleDescription As String
+End Interface

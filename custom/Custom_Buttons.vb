@@ -149,7 +149,7 @@ Class CustomButton : Inherits customControl
 #End Region
 #Region "fn"
     Protected Overrides Sub PaintHook()
-        If animatedcontrols.Contains(Me) Then calc()
+        If animating Then calc()
         G.Clear(Parent.BackColor)
         If DesignMode Then G.InterpolationMode = 7 : G.DrawImageUnscaled(retbit(), 0, 0)
         G.InterpolationMode = 7
