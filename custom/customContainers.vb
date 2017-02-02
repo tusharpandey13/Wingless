@@ -95,10 +95,9 @@ Class CustomTab
         e.Graphics.DrawImage(B.Clone, 0, 0)
         G.Dispose() : B.Dispose()
     End Sub
-    'Protected Overrides Sub Dispose(disposing As Boolean)
-    '    MyBase.Dispose(disposing)
-    '    'animatedcontrols.Remove(Me)
-    '    If animatedcontrols.Count = 0 Then stopTimer()
-    'End Sub
+    Protected Overrides Sub Dispose(disposing As Boolean)
+        MyBase.Dispose(disposing)
+        'animatedcontrols.Remove(Me)
+    End Sub
 End Class
 

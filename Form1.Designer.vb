@@ -35,7 +35,7 @@ Partial Class Form1
         Me.CustomTab1.Controls.Add(Me.TabPage2)
         Me.CustomTab1.HighlightColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(82, Byte), Integer), CType(CType(82, Byte), Integer))
         Me.CustomTab1.ItemSize = New System.Drawing.Size(25, 30)
-        Me.CustomTab1.Location = New System.Drawing.Point(85, 58)
+        Me.CustomTab1.Location = New System.Drawing.Point(93, 56)
         Me.CustomTab1.Name = "CustomTab1"
         Me.CustomTab1.SelectedIndex = 0
         Me.CustomTab1.Size = New System.Drawing.Size(473, 358)
