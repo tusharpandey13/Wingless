@@ -271,14 +271,17 @@ Public Class CustomWindow : Inherits Form
 
 
     Protected Overrides Sub OnPaintBackground(e As PaintEventArgs)
-#Region "prep"
+
+
+
         'If fxt <> 0 Then closefx()
         Dim g = e.Graphics
         Static bc As Color
         Dim d As Boolean = 0
         g.Clear(BackColor) 'prep
-#End Region
-#Region "fill n border"
+
+
+
         If rescol(BackColor) = Color.White Then
             'dark
             d = 1
@@ -295,11 +298,9 @@ Public Class CustomWindow : Inherits Form
         End If
         g.FillRectangle(mb(ForeColor), rct(Me))
         g.FillRectangle(mb(BackColor), rct(0, 34, Width - 0, Height - 3 - 34))
-        g.DrawRectangle(tp, 0, 0, Width - 1, Height - 1) 'border
-#End Region
+        g.DrawRectangle(tp, 0, 0, Width - 1, Height - 1) 'border'fill and border
 
 
-#Region "shadows"
         mp(col(30, 0))
         'g.DrawLine(tp, 0, 33, Width, 33)
         'mp(col(100, 255)) : g.DrawLine(tp, 0, 34, Width, 34)
@@ -325,10 +326,9 @@ Public Class CustomWindow : Inherits Form
         For i! = 0 To 23
             a = inp.GetValue(0, 128, i, 50, Interpolation.Type.Smootherstep, 3)
             g.DrawLine(New Pen(col(a * 2, 0)), 0, Height - 3 - 23 + i, Width, Height - 3 - 23 + i)
-        Next
-#End Region
+        Next 'shadows
 
-#Region "cb"
+
         If rescol(ForeColor) = Color.White Then '							dark
             g.DrawImageUnscaled(lb(0), pt(Width - 99 - BorderWidth / 2, 0))
             g.DrawImageUnscaled(lb(3), pt(Width - 99 - BorderWidth / 2 + 66, 0))
@@ -343,14 +343,14 @@ Public Class CustomWindow : Inherits Form
             tb = mb(bc)
             g.FillRectangle(tb, cbx, 0, 33, 32)
         End If 'controlbox
-#End Region
 
-#Region "corners"
+
+
         px(Color.Fuchsia, 0, 0, g)
         px(Color.Fuchsia, Width - 1, 0, g)
         px(Color.Fuchsia, 0, Height - 1, g)
-        px(Color.Fuchsia, Width - 1, Height - 1, g) 'corners
-#End Region
+        px(Color.Fuchsia, Width - 1, Height - 1, g) 'corners'corners
+
 
         g.TextRenderingHint = 5
         g.DrawString(Text, Font, mb(col(100, 0)), 10, 11)
