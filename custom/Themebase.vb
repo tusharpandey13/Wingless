@@ -303,15 +303,6 @@ MustInherit Class customControl
 
     Public Property animating As Boolean Implements AnimatedObject.animating
 
-    Private Overloads Property custom_AccessibleDescription As String Implements AnimatedObject.AccessibleDescription
-        Get
-            Return Me.AccessibleDescription
-        End Get
-        Set(value As String)
-            Me.AccessibleDescription = value
-        End Set
-    End Property
-
 
 #Region " Property Helpers "
     Protected Overridable Sub InvalidateBitmap()
@@ -549,13 +540,3 @@ MustInherit Class customControl
 #End Region
 End Class
 #End Region
-
-
-Public Interface AnimatedObject
-    ReadOnly Property designing As Boolean
-    Property animating As Boolean
-    Sub leavemouse(e As EventArgs)
-
-    Sub invalidate()
-    Property AccessibleDescription As String
-End Interface

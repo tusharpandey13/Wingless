@@ -42,14 +42,6 @@ Class CustomTab : Inherits TabControl : Implements AnimatedObject
 
     Public Property animating As Boolean Implements AnimatedObject.animating
 
-    Private Property custom_AccessibleDescription As String Implements AnimatedObject.AccessibleDescription
-        Get
-            Return Me.AccessibleDescription
-        End Get
-        Set(value As String)
-            Me.AccessibleDescription = value
-        End Set
-    End Property
 #End Region
 #Region "CTOR"
     Sub New()
@@ -61,7 +53,7 @@ Class CustomTab : Inherits TabControl : Implements AnimatedObject
         Next
         ItemSize = New Size(25, 30)
         bo = New Bitmap(Width, Height) : bn = bo
-        addanimatedobject(Me)
+        addAnimatedobject(Me)
     End Sub
     Protected Overrides Sub CreateHandle()
         MyBase.CreateHandle()

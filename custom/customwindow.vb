@@ -1,6 +1,6 @@
 ﻿Imports System.Runtime.InteropServices
 Imports System.Drawing.Drawing2D
-Imports WindowsApplication3
+
 
 Public Class CustomWindow : Inherits Form : Implements AnimatedObject
 
@@ -18,14 +18,6 @@ Public Class CustomWindow : Inherits Form : Implements AnimatedObject
         Get
             Return DesignMode
         End Get
-    End Property
-    Private Property custom_AccessibleDescription As String Implements AnimatedObject.AccessibleDescription
-        Get
-            Return Me.AccessibleDescription
-        End Get
-        Set(value As String)
-            Me.AccessibleDescription = value
-        End Set
     End Property
 #End Region
 
