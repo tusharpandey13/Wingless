@@ -159,7 +159,7 @@ Namespace Multimedia
     ''' <summary>
     ''' Represents the Windows multimedia timer.
     ''' </summary>
-    Public NotInheritable Class Timer
+    <ToolboxItem(False)> Public NotInheritable Class Timer
         Implements IComponent
 #Region "Timer Members"
 

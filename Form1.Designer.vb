@@ -35,7 +35,8 @@ Partial Class Form1
         Me.Custom_Material_Button1.Font = New System.Drawing.Font("Segoe UI", 9.0!)
         Me.Custom_Material_Button1.ForeColor = System.Drawing.Color.FromArgb(CType(CType(220, Byte), Integer), CType(CType(220, Byte), Integer), CType(CType(220, Byte), Integer))
         Me.Custom_Material_Button1.Image = Nothing
-        Me.Custom_Material_Button1.Location = New System.Drawing.Point(113, 130)
+        Me.Custom_Material_Button1.Location = New System.Drawing.Point(319, 269)
+        Me.Custom_Material_Button1.myProperty = ""
         Me.Custom_Material_Button1.Name = "Custom_Material_Button1"
         Me.Custom_Material_Button1.Size = New System.Drawing.Size(181, 73)
         Me.Custom_Material_Button1.TabIndex = 0

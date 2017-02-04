@@ -1,129 +1,7 @@
-﻿Imports System.Drawing.Drawing2D
-
-Class custom_Material_Button
-    Inherits customControl
-    Private x As Single = 75.0
-    Private y As Single = 75.0
-    Private isd As Integer = 0
-    Dim total As Single
-    Dim d(8) As Single
-    Dim t% = 0
-    Dim hc As Color = col(0, 0)
-    Private w! = 0.0
-    Dim iso! = 0
-    Private fc As Color = col(100, 0) : <System.ComponentModel.Category("Appearance")> Public Property FloodColor As Color
-        Get
-            Return fc
-        End Get
-        Set(value As Color)
-            fc = value
-            Invalidate()
-        End Set
-    End Property
-
-    Sub New()
-        Height = 150
-        Width = 150
-    End Sub
-
-
-    Protected Overrides Sub OnMouseDown(e As MouseEventArgs)
-        MyBase.OnMouseDown(e)
-        x = e.X
-        y = e.Y
-        d = {x,
-             y,
-             Width - x,
-             Height - y,
-             (x ^ 2 + y ^ 2) ^ (1 / 2),
-             ((Width - x) ^ 2 + y ^ 2) ^ (1 / 2),
-             (x ^ 2 + (Height - y) ^ 2) ^ (1 / 2),
-             ((Width - x) ^ 2 + (Height - y) ^ 2) ^ (1 / 2)}
-        Dim bigi As Byte = 0
-        For i = 0 To 7
-            If d(i) > d(bigi) Then bigi = i
-        Next
-        total = d(bigi) + 2
-        isd = 1
-        animating = True
-    End Sub
-    Protected Overrides Sub PaintHook()
-        Dim gd As Boolean : If rescol(BackColor) = Color.White Then gd = True Else gd = 0
-
-        G.SmoothingMode = 2 : G.InterpolationMode = 7 : G.TextRenderingHint = 5
-        G.Clear(BackColor)
-        G.SmoothingMode = 2
-        If gd Then tb = mb(col(15, 255)) Else tb = mb(col(10, 0))
-        G.FillRectangle(tb, rct(Me))
-        G.FillRectangle(mb(retdata().colorparam(1)), rct(Me))
-        G.FillEllipse(mb(retdata().colorparam(0)), retdata().rctparam(0))
-        G.TextRenderingHint = 5
-        G.DrawString(Me.Text, Me.Font, mb(Me.ForeColor), pt(Me.Width / 2, Me.Height / 2), CenterSF)
-        G.SmoothingMode = 3
-
-    End Sub
-
-    Public Function retdata() As drawdata
-        calc()
-        Dim dd As drawdata = New drawdata
-        dd.colorparam = {col(Math.Abs(150 * (1.5 - (w / (total + 0.001)))), FloodColor), hc}
-        dd.rctparam = {rct(x - w, y - w, w * 2, w * 2)}
-        Return dd
-    End Function
-
-    Sub calc()
-
-        If isd = 1 Then
-            If Not t >= 1000 Then
-                t += 1
-                w = GetValue(0, total, t, 1000, Type.SmoothStep, EasingMethods.Exponent, 0.65)
-                'w = GetValue(0, total, t, 1000, Type.EaseOut, EasingMethods.Exponent, 0.65)
-            Else
-                t = 0
-                w = 0.0
-                isd = 0
-                If iso = 0 Then animating = False
-            End If
-        End If
-
-        If iso = 1 Then
-            If t1 < 400 Then
-                t1 += 1
-                hc = col(GetValue(0, 25, t1, 400, Type.SmoothStep, EasingMethods.Exponent, 0.65), rescol(BackColor))
-            Else
-                t1 = 0 : iso = 0
-                If isd = 0 Then animating = False
-            End If
-        ElseIf iso = 2 Then
-            If t1 < 250 Then
-                t1 += 1
-                hc = col(GetValue(25, 0, t1, 250, Type.SmoothStep, EasingMethods.Exponent, 0.65), rescol(BackColor))
-            Else
-                t1 = 0 : iso = 0
-                If isd = 0 Then animating = False
-            End If
-        End If
-
-    End Sub
-
-    Dim t1% = 0
-
-    Protected Overrides Sub OnMouseEnter(e As EventArgs)
-        MyBase.OnMouseEnter(e)
-        iso = 1
-        animating = True
-    End Sub
-    Protected Overrides Sub OnMouseLeave(e As EventArgs)
-        If Not hc.A = 0 Then iso = 2
-        animating = True
-    End Sub
-End Class
-
-
-
-
-
-
+﻿Imports System.ComponentModel
+Imports System.Drawing.Design
+Imports System.Drawing.Drawing2D
+Imports System.Windows.Forms.Design
 Class CustomButton : Inherits customControl
 #Region "declare"
     Dim tg, t1g As Graphics
@@ -288,6 +166,174 @@ Class CustomButton : Inherits customControl
 
 
 End Class
+
+Class custom_Material_Button
+    Inherits customControl
+    Private x As Single = 75.0
+    Private y As Single = 75.0
+    Private isd As Integer = 0
+    Dim total As Single
+    Dim d(8) As Single
+    Dim t% = 0
+    Dim hc As Color = col(0, 0)
+    Private w! = 0.0
+    Dim iso! = 0
+    Private m_myProperty As String = ""
+
+    'This property uses our custom UITypeEditor: myListBoxPropertyEditor
+    <EditorAttribute(GetType(myListBoxPropertyEditor),
+     GetType(System.Drawing.Design.UITypeEditor))>
+    Public Property myProperty() As String
+        Get
+            Return m_myProperty
+        End Get
+        Set(ByVal value As String)
+            m_myProperty = value
+        End Set
+    End Property
+
+    Private fc As Color = col(100, 0) : <System.ComponentModel.Category("Appearance")> Public Property FloodColor As Color
+        Get
+            Return fc
+        End Get
+        Set(value As Color)
+            fc = value
+            Invalidate()
+        End Set
+    End Property
+
+    Sub New()
+        Height = 150
+        Width = 150
+    End Sub
+
+
+    Protected Overrides Sub OnMouseDown(e As MouseEventArgs)
+        MyBase.OnMouseDown(e)
+        x = e.X
+        y = e.Y
+        d = {x,
+             y,
+             Width - x,
+             Height - y,
+             (x ^ 2 + y ^ 2) ^ (1 / 2),
+             ((Width - x) ^ 2 + y ^ 2) ^ (1 / 2),
+             (x ^ 2 + (Height - y) ^ 2) ^ (1 / 2),
+             ((Width - x) ^ 2 + (Height - y) ^ 2) ^ (1 / 2)}
+        Dim bigi As Byte = 0
+        For i = 0 To 7
+            If d(i) > d(bigi) Then bigi = i
+        Next
+        total = d(bigi) + 2
+        isd = 1
+        animating = True
+    End Sub
+    Protected Overrides Sub PaintHook()
+        Dim gd As Boolean : If rescol(BackColor) = Color.White Then gd = True Else gd = 0
+
+        G.SmoothingMode = 2 : G.InterpolationMode = 7 : G.TextRenderingHint = 5
+        G.Clear(BackColor)
+        G.SmoothingMode = 2
+        If gd Then tb = mb(col(15, 255)) Else tb = mb(col(10, 0))
+        G.FillRectangle(tb, rct(Me))
+        G.FillRectangle(mb(retdata().colorparam(1)), rct(Me))
+        G.FillEllipse(mb(retdata().colorparam(0)), retdata().rctparam(0))
+        G.TextRenderingHint = 5
+        G.DrawString(Me.Text, Me.Font, mb(Me.ForeColor), pt(Me.Width / 2, Me.Height / 2), CenterSF)
+        G.SmoothingMode = 3
+
+    End Sub
+
+    Public Function retdata() As drawdata
+        calc()
+        Dim dd As drawdata = New drawdata
+        dd.colorparam = {col(Math.Abs(150 * (1.5 - (w / (total + 0.001)))), FloodColor), hc}
+        dd.rctparam = {rct(x - w, y - w, w * 2, w * 2)}
+        Return dd
+    End Function
+
+    Sub calc()
+
+        If isd = 1 Then
+            If Not t >= 1000 Then
+                t += 1
+                w = GetValue(0, total, t, 1000, Type.SmoothStep, EasingMethods.Exponent, 0.65)
+                'w = GetValue(0, total, t, 1000, Type.EaseOut, EasingMethods.Exponent, 0.65)
+            Else
+                t = 0
+                w = 0.0
+                isd = 0
+                If iso = 0 Then animating = False
+            End If
+        End If
+
+        If iso = 1 Then
+            If t1 < 400 Then
+                t1 += 1
+                hc = col(GetValue(0, 25, t1, 400, Type.SmoothStep, EasingMethods.Exponent, 0.65), rescol(BackColor))
+            Else
+                t1 = 0 : iso = 0
+                If isd = 0 Then animating = False
+            End If
+        ElseIf iso = 2 Then
+            If t1 < 250 Then
+                t1 += 1
+                hc = col(GetValue(25, 0, t1, 250, Type.SmoothStep, EasingMethods.Exponent, 0.65), rescol(BackColor))
+            Else
+                t1 = 0 : iso = 0
+                If isd = 0 Then animating = False
+            End If
+        End If
+
+    End Sub
+
+    Dim t1% = 0
+
+    Protected Overrides Sub OnMouseEnter(e As EventArgs)
+        MyBase.OnMouseEnter(e)
+        iso = 1
+        animating = True
+    End Sub
+    Protected Overrides Sub OnMouseLeave(e As EventArgs)
+        If Not hc.A = 0 Then iso = 2
+        animating = True
+    End Sub
+End Class
+
+
+
+Public Class myListBoxPropertyEditor
+    Inherits PropertyEditorBase
+
+    Private WithEvents myform As New Form 'this is the control to be used 
+    'in design time DropDown editor
+
+    Protected Overrides Function GetEditControl(ByVal PropertyName As String,
+      ByVal CurrentValue As Object) As Control
+
+        myform.FormBorderStyle = 0
+
+        Return myform
+
+    End Function
+
+
+    Protected Overrides Function GetEditedValue(ByVal EditControl As Control,
+       ByVal PropertyName As String, ByVal OldValue As Object) As Object
+        Return myform.Text 'return new value for property
+    End Function
+
+
+    Private Sub myTreeView_Click(ByVal sender As Object, ByVal e As _
+                                     System.EventArgs) Handles myform.Click
+        myform.Close()
+    End Sub
+
+End Class
+
+
+
+
 
 
 

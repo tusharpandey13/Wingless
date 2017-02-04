@@ -8,20 +8,23 @@ Module Helpers
 
 
 #Region "Color"
+    Friend Function col(a!, r!, g!, b!, sat!) As Color
+        Return Color.FromArgb(CByte(CInt(a)), CByte(Math.Min(255, Math.Max(0, CInt(r) * sat))), CByte(Math.Min(255, Math.Max(0, CInt(g) * sat))), CByte(Math.Min(255, Math.Max(0, CInt(b) * sat))))
+    End Function
     Friend Function col(a!, r!, g!, b!) As Color
-        Return Color.FromArgb(CByte(CInt(a)), CByte(CInt(r)), CByte(CInt(g)), CByte(CInt(b)))
+        Return col(a, r, g, b, 1)
     End Function
     Friend Function col(r As Byte, g As Byte, b As Byte) As Color
         Return col(255, r, g, b)
+    End Function
+    Friend Function col(c As Color, sat!) As Color
+        Return col(c.A, c.R, c.G, c.B, sat)
     End Function
     Friend Function col(br As SolidBrush) As Color
         Return br.Color
     End Function
     Friend Function col(a As Byte, br As SolidBrush) As Color
         Return Color.FromArgb(CByte(CInt(a)), br.Color)
-    End Function
-    Friend Function col(c As Color, sat!) As Color
-        Return Color.FromArgb(CByte(CInt(c.A)), CByte(Math.Min(255, Math.Max(0, CInt(c.R) * sat))), CByte(Math.Min(255, Math.Max(0, CInt(c.G) * sat))), CByte(Math.Min(255, Math.Max(0, CInt(c.B) * sat))))
     End Function
     Friend Function col(c As Color, sat!, limit As Color, l As LimitingType) As Color
         Dim floor, ceil As Color
@@ -32,7 +35,7 @@ Module Helpers
             ceil = limit
             floor = col(0)
         End If
-        Return Color.FromArgb(CByte(CInt(c.A)), CByte(Math.Min(CInt(ceil.R), Math.Max(CInt(floor.R), CInt(c.R) * sat))), CByte(Math.Min(CInt(ceil.R), Math.Max(CInt(floor.G), CInt(c.G) * sat))), CByte(Math.Min(CInt(ceil.R), Math.Max(CInt(floor.B), CInt(c.B) * sat))))
+        Return col(c.A, CByte(Math.Min(CInt(ceil.R), Math.Max(CInt(floor.R), CInt(c.R) * sat))), CByte(Math.Min(CInt(ceil.R), Math.Max(CInt(floor.G), CInt(c.G) * sat))), CByte(Math.Min(CInt(ceil.R), Math.Max(CInt(floor.B), CInt(c.B) * sat))))
     End Function
     Friend Function col(n As Byte) As Color
         Return col(n, n, n)
@@ -41,7 +44,7 @@ Module Helpers
         Return col(a, n, n, n)
     End Function
     Friend Function col(a As Byte, c As Color) As Color
-        Return Color.FromArgb(CByte(CInt(a)), c)
+        Return col(a, c.R, c.G, c.B, 1)
     End Function
 
     Friend Function lc(c As Color, n As Integer) As Color
@@ -87,7 +90,28 @@ Module Helpers
     Friend Function blendcol(c1 As Color, c2 As Color, Optional r! = 0.5) As Color
         Return col(CByte(CInt(c1.R) * r + CInt(c2.R) * (1 - r)), CByte(CInt(c1.G) * r + CInt(c2.G) * (1 - r)), CByte(CInt(c1.B) * r + CInt(c2.B) * (1 - r)))
     End Function
-
+    Friend Function hsltorgb(h!, s!, l!) As Color
+        Dim c!, x!, m!
+        c = (1 - Math.Abs(2 * l - 1)) * s
+        x = c * (1 - Math.Abs(((h / 60) Mod 2) - 1))
+        m = l - c / 2
+        Return cyltorgb(c, x, m, h)
+    End Function
+    Friend Function hsvtorgb(h!, s!, v!) As Color
+        Dim c!, x!, m!
+        c = v * s
+        x = c * (1 - Math.Abs(((h / 60) Mod 2) - 1))
+        m = v - c
+        Return cyltorgb(c, x, m, h)
+    End Function
+    Private Function cyltorgb(c!, x!, m!, h!) As Color
+        Dim rd() = {c, x, 0, 0, x, c}
+        Dim gd() = {x, c, c, x, 0, 0}
+        Dim bd() = {0, 0, x, c, c, x}
+        Dim t = Math.Ceiling(h / 60)
+        If t <= 0 Then t = 0 Else t -= 1
+        Return col((rd(t) + m) * 255, (gd(t) + m) * 255, (bd(t) + m) * 255)
+    End Function
 #End Region
 
 #Region "Pens"
