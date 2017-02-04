@@ -10,125 +10,14 @@ MustInherit Class customControl
     Inherits Control
     Implements AnimatedObject
 
-#Region " Initialization "
 
+#Region "DECLARE"
     Protected G As Graphics, B As Bitmap
-
-    Sub New()
-        SetStyle(ControlStyles.AllPaintingInWmPaint Or ControlStyles.OptimizedDoubleBuffer Or ControlStyles.ResizeRedraw Or ControlStyles.UserPaint Or ControlStyles.SupportsTransparentBackColor, True)
-
-        _ImageSize = Size.Empty
-        Font = New Font("Segoe UI", 9S)
-
-        upcust()
-    End Sub
-
-    Protected NotOverridable Overrides Sub OnHandleCreated(ByVal e As EventArgs)
-
-        If Not _LockWidth = 0 Then Width = _LockWidth
-        If Not _LockHeight = 0 Then Height = _LockHeight
-
-        Transparent = _Transparent
-        If _Transparent AndAlso _BackColor Then BackColor = Color.Transparent
-
-        addAnimatedobject(Me)
-
-        MyBase.OnHandleCreated(e)
-    End Sub
-
+    Dim ht As New Hashtable
     Private DoneCreation As Boolean
-    Protected NotOverridable Overrides Sub OnParentChanged(ByVal e As EventArgs)
-        If Parent IsNot Nothing Then
-            OnCreation()
-
-            DoneCreation = True
-            upcust()
-        End If
-        MyBase.OnParentChanged(e)
-    End Sub
-
-#End Region
-
-#Region "Paint"
-    Protected NotOverridable Overrides Sub OnPaint(ByVal e As PaintEventArgs)
-        If Width = 0 OrElse Height = 0 Then Return
-
-        If _Transparent Then
-            PaintHook()
-            e.Graphics.DrawImage(B, 0, 0)
-        Else
-            G = e.Graphics
-            PaintHook()
-        End If
-    End Sub
-    Friend Function retbit() As Bitmap
-        If Width = 0 OrElse Height = 0 Then Return New Bitmap(0, 0)
-        PaintHook()
-        Return B
-    End Function
-
-#End Region
-
-#Region " Size Handling "
-
-    Protected NotOverridable Overrides Sub OnSizeChanged(ByVal e As EventArgs)
-        If _Transparent Then
-            InvalidateBitmap()
-        End If
-
-        Invalidate()
-        MyBase.OnSizeChanged(e)
-    End Sub
-
-    Protected Overrides Sub SetBoundsCore(ByVal x As Integer, ByVal y As Integer, ByVal width As Integer, ByVal height As Integer, ByVal specified As BoundsSpecified)
-        If Not _LockWidth = 0 Then width = _LockWidth
-        If Not _LockHeight = 0 Then height = _LockHeight
-        MyBase.SetBoundsCore(x, y, width, height, specified)
-    End Sub
-
-#End Region
-
-#Region " State Handling "
-
     Private InPosition As Boolean
-    Protected Overrides Sub OnMouseEnter(ByVal e As EventArgs)
-        InPosition = True
-        SetState(MouseState.Over)
-        For Each c As Control In Parent.Controls
-            If TypeOf c Is customControl Then
-                DirectCast(c, customControl).leavemouse(e)
-                c.Invalidate()
-            End If
-        Next
-        MyBase.OnMouseEnter(e)
-    End Sub
-    Public Sub leavemouse(e As EventArgs) Implements AnimatedObject.leavemouse
-        OnMouseLeave(e)
-    End Sub
-    Protected Overrides Sub OnMouseUp(ByVal e As MouseEventArgs)
-        If InPosition Then SetState(MouseState.Over)
-        MyBase.OnMouseUp(e)
-    End Sub
-    Protected Overrides Sub OnMouseDown(ByVal e As MouseEventArgs)
-        If e.Button = MouseButtons.Left Then SetState(MouseState.Down)
-        MyBase.OnMouseDown(e)
-    End Sub
-    Protected Overrides Sub OnMouseLeave(ByVal e As EventArgs)
-        InPosition = False
-        SetState(MouseState.None)
-        MyBase.OnMouseLeave(e)
-    End Sub
-    Protected Overrides Sub OnEnabledChanged(ByVal e As EventArgs)
-        If Enabled Then SetState(MouseState.None) Else SetState(MouseState.Block)
-        MyBase.OnEnabledChanged(e)
-    End Sub
     Protected State As MouseState
-    Private Sub SetState(ByVal current As MouseState)
-        State = current
-        Invalidate()
-    End Sub
-
-#End Region
+    Protected tp As Pen, tb As Brush
 
 #Region "Props"
 #Region " Base Properties "
@@ -302,7 +191,116 @@ MustInherit Class customControl
     End Property
 
     Public Property animating As Boolean Implements AnimatedObject.animating
+#End Region
 
+#End Region
+
+#Region " Initialization "
+    Sub New()
+        SetStyle(ControlStyles.AllPaintingInWmPaint Or ControlStyles.OptimizedDoubleBuffer Or ControlStyles.ResizeRedraw Or ControlStyles.UserPaint Or ControlStyles.SupportsTransparentBackColor, True)
+
+        _ImageSize = Size.Empty
+        Font = New Font("Segoe UI", 9S)
+
+        upcust()
+    End Sub
+    Protected NotOverridable Overrides Sub OnHandleCreated(ByVal e As EventArgs)
+
+        If Not _LockWidth = 0 Then Width = _LockWidth
+        If Not _LockHeight = 0 Then Height = _LockHeight
+
+        Transparent = _Transparent
+        If _Transparent AndAlso _BackColor Then BackColor = Color.Transparent
+
+        addAnimatedobject(Me)
+
+        MyBase.OnHandleCreated(e)
+    End Sub
+    Protected NotOverridable Overrides Sub OnParentChanged(ByVal e As EventArgs)
+        If Parent IsNot Nothing Then
+            OnCreation()
+
+            DoneCreation = True
+            upcust()
+        End If
+        MyBase.OnParentChanged(e)
+    End Sub
+#End Region
+
+#Region "Paint"
+    Protected NotOverridable Overrides Sub OnPaint(ByVal e As PaintEventArgs)
+        If Width = 0 OrElse Height = 0 Then Return
+        tp = New Pen(Color.Transparent, 1)
+        tb = New SolidBrush(Color.Transparent)
+        If _Transparent Then
+            PaintHook()
+            e.Graphics.DrawImage(B, 0, 0)
+        Else
+            G = e.Graphics
+            PaintHook()
+        End If
+        tp.Dispose() : tb.Dispose()
+    End Sub
+    Friend Function retbit() As Bitmap
+        If Width = 0 OrElse Height = 0 Then Return New Bitmap(0, 0)
+        PaintHook()
+        Return B
+    End Function
+#End Region
+
+#Region " Size Handling "
+    Protected NotOverridable Overrides Sub OnSizeChanged(ByVal e As EventArgs)
+        If _Transparent Then
+            InvalidateBitmap()
+        End If
+
+        Invalidate()
+        MyBase.OnSizeChanged(e)
+    End Sub
+    Protected Overrides Sub SetBoundsCore(ByVal x As Integer, ByVal y As Integer, ByVal width As Integer, ByVal height As Integer, ByVal specified As BoundsSpecified)
+        If Not _LockWidth = 0 Then width = _LockWidth
+        If Not _LockHeight = 0 Then height = _LockHeight
+        MyBase.SetBoundsCore(x, y, width, height, specified)
+    End Sub
+#End Region
+
+#Region " State Handling "
+    Protected Overrides Sub OnMouseEnter(ByVal e As EventArgs)
+        InPosition = True
+        SetState(MouseState.Over)
+        For Each c As Control In Parent.Controls
+            If TypeOf c Is customControl Then
+                DirectCast(c, customControl).leavemouse(e)
+                c.Invalidate()
+            End If
+        Next
+        MyBase.OnMouseEnter(e)
+    End Sub
+    Public Sub leavemouse(e As EventArgs) Implements AnimatedObject.leavemouse
+        OnMouseLeave(e)
+    End Sub
+    Protected Overrides Sub OnMouseUp(ByVal e As MouseEventArgs)
+        If InPosition Then SetState(MouseState.Over)
+        MyBase.OnMouseUp(e)
+    End Sub
+    Protected Overrides Sub OnMouseDown(ByVal e As MouseEventArgs)
+        If e.Button = MouseButtons.Left Then SetState(MouseState.Down)
+        MyBase.OnMouseDown(e)
+    End Sub
+    Protected Overrides Sub OnMouseLeave(ByVal e As EventArgs)
+        InPosition = False
+        SetState(MouseState.None)
+        MyBase.OnMouseLeave(e)
+    End Sub
+    Protected Overrides Sub OnEnabledChanged(ByVal e As EventArgs)
+        If Enabled Then SetState(MouseState.None) Else SetState(MouseState.Block)
+        MyBase.OnEnabledChanged(e)
+    End Sub
+    Private Sub SetState(ByVal current As MouseState)
+        State = current
+        Invalidate()
+    End Sub
+#End Region
 
 #Region " Property Helpers "
     Protected Overridable Sub InvalidateBitmap()
@@ -310,8 +308,6 @@ MustInherit Class customControl
         B = New Bitmap(Width, Height, Imaging.PixelFormat.Format32bppPArgb)
         G = Graphics.FromImage(B)
     End Sub
-
-#End Region
 
 #End Region
 
@@ -408,135 +404,35 @@ MustInherit Class customControl
 #End Region
 #End Region
 
-#Region "Enum"
-    Public Enum MouseState As Byte
-        None = 0
-        Over = 1
-        Down = 2
-        Block = 3
-    End Enum
-
-    ''' <summary>
-    ''' The different types of Interpolation.
-    ''' </summary>
-    Public Enum Type
-        ''' <summary>
-        ''' Start at full speed, and then retard.
-        ''' </summary>
-        EaseIn
-        ''' <summary>
-        ''' Start at zero speed, and then accelerate.
-        ''' </summary>
-        EaseOut
-        ''' <summary>
-        ''' Retard during the first half of the motion and then accelerate during the second half.
-        ''' </summary>
-        EaseInOut
-        ''' <summary>
-        ''' Complete the motion with no change in speed.
-        ''' </summary>
-        Linear
-        ''' <summary>
-        ''' Represents motion according to the CatmullRom spline.
-        ''' 2 points, Pt1 and Pt2 are specifyied to represent the 2 tangents to the curve.
-        ''' </summary>
-        CatmullRom
-        ''' <summary>
-        ''' Generates a curve with slope approaching zero near the start and end points, and approaching 1 near the middle, resulting in a smooth, natural motion.
-        ''' </summary>
-        SmoothStep
-        ''' <summary>
-        ''' A smoother version of the SmoothStep Interpolation Type, with the curve flatter at the ends.
-        ''' </summary>
-        Smootherstep
-    End Enum
-
-    ''' <summary>
-    ''' The different methods of easing for easing Interpolations.
-    ''' </summary>
-    Public Enum EasingMethods
-        ''' <summary>
-        ''' Regualar easing. The motion depends upon the power specifyied and corresponds to the curve of degree equal to the given power.
-        ''' </summary>
-        Regular
-        ''' <summary>
-        ''' The motion corresponds to the curve of 2 raised to the power 10(x-1). Exponential curve has a lot of curvature and thus results in a sudden change in value as the slope approaches infinity near the end.
-        ''' </summary>
-        Exponent
-        ''' <summary>
-        ''' Motion corresponds to a circular plot, resulting in a more 'sudden' change in values near the mid point.
-        ''' </summary>
-        Circular
-        ''' <summary>
-        ''' A gentle easing is apllied, based on the sinusoidal curve. Slope approaches 1 for most of the part of the motion.
-        ''' </summary>
-        Sine
-        ''' <summary>
-        ''' Motion resembles that of bouncing ball, reversing back a little distance near the ends.
-        ''' </summary>
-        Bounce
-        ''' <summary>
-        ''' Causes the motion to go beyond the Ending Point and then return back. Note that a similar effect can be achieved using the CatmullRom Interpolation technique with values of Pt1 and Pt2 equal to -10 and 0.
-        ''' </summary>
-        Jumpback
-        ''' <summary>
-        ''' Resembles to the motion of an elastic band, stretched and then released. Slope alternatively approaches -infinity and +infinity.
-        ''' </summary>
-        Elastic
-        ''' <summary>
-        ''' Motion represents forced stopping of a heavy object moving with high velocity. Slope approaches infinity near the start and zero near the ends.
-        ''' </summary>
-        Critical_Damping
-        '		Flash
-    End Enum
-#End Region
-
-    Protected Overrides Sub Dispose(disposing As Boolean)
-        MyBase.Dispose(disposing)
-        removeAnimatedobject(Me)
-    End Sub
-
-
 #Region "Animation"
     Private Function GetValue(StartV#, EndV#, Time#, Duration#, IType As Type, Method As EasingMethods, Power#, Q#, R#) As Single
         Dim i As New Interpolation
         Return i.GetValue(StartV, EndV, Time, Duration, IType, Method, Power, Q, R)
     End Function
     Public Function GetValue(StartV#, EndV#, Time#, Duration#, Q#, R#) As Single
-        Return GetValue(StartV, EndV, Time, Duration, Interpolation.Type.CatmullRom, Interpolation.EasingMethods.Regular, 1, Q, R)
+        Return GetValue(StartV, EndV, Time, Duration, Type.CatmullRom, EasingMethods.Regular, 1, Q, R)
     End Function
-    Public Function GetValue(StartV#, EndV#, Time#, Duration#, IType As Interpolation.Type, Power#) As Single
-        Return GetValue(StartV, EndV, Time, Duration, IType, Interpolation.EasingMethods.Regular, Power, 0, 0)
+    Public Function GetValue(StartV#, EndV#, Time#, Duration#, IType As Type, Power#) As Single
+        Return GetValue(StartV, EndV, Time, Duration, IType, EasingMethods.Regular, Power, 0, 0)
     End Function
-    Public Function GetValue(StartV#, EndV#, Time#, Duration#, IType As Interpolation.Type, Method As Interpolation.EasingMethods, Power#) As Single
+    Public Function GetValue(StartV#, EndV#, Time#, Duration#, IType As Type, Method As EasingMethods, Power#) As Single
         Return GetValue(StartV, EndV, Time, Duration, IType, Method, Power, 0, 0)
-    End Function
-
-    Public Shared Function blend(ParamArray Colors() As Color) As Color
-        Dim c As Color
-        Dim r% = 0
-        Dim b% = 0
-        Dim g% = 0
-        Dim n% = 0
-        Dim a% = 0
-        For Each col As Color In Colors
-            n += 1
-            r += col.R
-            g += col.G
-            b += col.B
-            a += col.A
-        Next
-        r /= n
-        g /= n
-        b /= n
-        a /= n
-        c = Color.FromArgb(a, r, g, b)
-        Return c
     End Function
 
     Private Sub custom_invalidate() Implements AnimatedObject.invalidate
         Invalidate()
     End Sub
+    Protected Overrides Sub Dispose(disposing As Boolean)
+        MyBase.Dispose(disposing)
+        removeAnimatedobject(Me)
+
+    End Sub
+
 #End Region
 End Class
 #End Region
+
+
+Partial Interface AnimatedObject
+
+End Interface

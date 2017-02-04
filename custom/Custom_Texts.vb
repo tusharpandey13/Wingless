@@ -248,8 +248,6 @@ Imports System.ComponentModel
     WithEvents Base As TextBox
     Public isf As Integer = 0
     Dim bc As Color
-    Dim tp As Pen
-    Dim tb As SolidBrush
     Dim w1! = 0.0
     Dim w2! = 0.0
     Dim x As Single = 0.0
@@ -426,10 +424,6 @@ Imports System.ComponentModel
         G.DrawLine(tp, 0, Height - 2, Width, Height - 2)
         mp(bw(col(55, ForeColor)), tp)
         G.DrawLine(tp, 0, Height - 1, Width, Height - 1) 'draw 2
-
-        tb.Dispose()
-        tp.Dispose() 'dispose
-
 
     End Sub
 

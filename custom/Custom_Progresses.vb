@@ -5,7 +5,6 @@ Imports System.ComponentModel
 
 Class customCircularProgress : Inherits customControl
 #Region "Declare"
-    Private arcp As Pen
     Private _Maximum As Double = 100
     Private _Value As Double = 0
 #End Region
@@ -51,7 +50,6 @@ Class customCircularProgress : Inherits customControl
         G.Clear(Parent.BackColor)
 
         simplev()
-        arcp.Dispose()
     End Sub
 
 
@@ -73,15 +71,15 @@ Class customCircularProgress : Inherits customControl
         gr.InterpolationMode = 7
 
         For h = 1 To 1
-            arcp = New Pen(Color.FromArgb(40 * h, 255 - Parent.BackColor.R, 255 - Parent.BackColor.G, 255 - Parent.BackColor.B), (2 - h) * 2.0!)
-            gr.DrawArc(arcp, New Rectangle(5.0! * 2.0!, 5.0! * 2.0!, CSng(Width - 10) * 2.0!, CSng(Height - 10) * 2.0!), -90, 360)
+            tp = New Pen(Color.FromArgb(40 * h, 255 - Parent.BackColor.R, 255 - Parent.BackColor.G, 255 - Parent.BackColor.B), (2 - h) * 2.0!)
+            gr.DrawArc(tp, New Rectangle(5.0! * 2.0!, 5.0! * 2.0!, CSng(Width - 10) * 2.0!, CSng(Height - 10) * 2.0!), -90, 360)
         Next
 
         If Value > 0.0# Then
             For i = 1 To 1
                 Dim ab1 = Color.FromArgb(260 - (13 * i), ForeColor)
-                arcp = New Pen(ab1, i * 2)
-                gr.DrawArc(arcp, New Rectangle(5.0! * 2.0!, 5.0! * 2.0!, CSng(Width - 10) * 2.0!, CSng(Height - 10) * 2.0!), -90 - 1, CSng(Value / Maximum * 360) + 2)
+                tp = New Pen(ab1, i * 2)
+                gr.DrawArc(tp, New Rectangle(5.0! * 2.0!, 5.0! * 2.0!, CSng(Width - 10) * 2.0!, CSng(Height - 10) * 2.0!), -90 - 1, CSng(Value / Maximum * 360) + 2)
             Next
 
 
@@ -91,7 +89,7 @@ Class customCircularProgress : Inherits customControl
             'gr.DrawArc(arcp, new rectangle(5, 5, Width - 10, Height - 10), sa - 100, ea + 200)
 
 
-            arcp = New Pen(ForeColor, 3)
+            'tp = New Pen(ForeColor, 3)
             'gr.DrawArc(arcp, new rectangle(5, 5, Width - 10, Height - 10), 0, CSng(Value / Maximum * 360))
         End If
         G.DrawImage(b, 0, 0, Width, Height)
@@ -379,7 +377,6 @@ Class customCircularMarquee
     Inherits customControl
     Dim t! = 0
     Dim t1! = 0
-    Dim p As Pen
     Sub New()
         SetStyle(ControlStyles.ResizeRedraw Or ControlStyles.AllPaintingInWmPaint Or ControlStyles.OptimizedDoubleBuffer Or ControlStyles.ResizeRedraw Or ControlStyles.UserPaint, True)
         UpdateStyles()
@@ -399,25 +396,25 @@ Class customCircularMarquee
 
 
 
-        'v! = i.GetValue(0, 360, t, 3000, Interpolation.Type.EaseInOut, Interpolation.EasingMethods.Jumpback, 2)
+        'v! = i.GetValue(0, 360, t, 3000, Type.EaseInOut, EasingMethods.Jumpback, 2)
         v! = i.GetValue(0, 360, t, 3000, 7, -5)
-        vs! = i.GetValue(0, 360 - v, t * 2, 3000, Interpolation.Type.EaseInOut, Interpolation.EasingMethods.Exponent, 1)
-        Dim vs1! = i.GetValue(0, 360 - v, t, 3000, Interpolation.Type.EaseInOut, Interpolation.EasingMethods.Exponent, 1)
+        vs! = i.GetValue(0, 360 - v, t * 2, 3000, Type.EaseInOut, EasingMethods.Exponent, 1)
+        Dim vs1! = i.GetValue(0, 360 - v, t, 3000, Type.EaseInOut, EasingMethods.Exponent, 1)
 
         G.Clear(Parent.BackColor)
 
         Dim r As New Rectangle(5, 5, Width - 10, Height - 10)
-        p = New Pen(Color.FromArgb(100, ForeColor), 0)  'customControl.rescol(Parent.BackColor)))
-        G.DrawArc(p, r, t1 + v, vs)
+        tp = New Pen(Color.FromArgb(100, ForeColor), 0)  'customControl.rescol(Parent.BackColor)))
+        G.DrawArc(tp, r, t1 + v, vs)
 
 
-        p = New Pen(Color.FromArgb(50, Color.Black), 1)
-        G.DrawArc(p, New Rectangle(5 - 1, 5 - 1, Width - 8, Height - 8), t1, vs1 * 1.2!)
+        tp = New Pen(Color.FromArgb(50, Color.Black), 1)
+        G.DrawArc(tp, New Rectangle(5 - 1, 5 - 1, Width - 8, Height - 8), t1, vs1 * 1.2!)
 
 
 
-        p = New Pen(Color.FromArgb(255, ForeColor), 2)
-        G.DrawArc(p, r, t1, vs1 * 1.2!)
+        tp = New Pen(Color.FromArgb(255, ForeColor), 2)
+        G.DrawArc(tp, r, t1, vs1 * 1.2!)
 
 
     End Sub

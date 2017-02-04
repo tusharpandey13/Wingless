@@ -22,166 +22,8 @@ Public Class CustomWindow : Inherits Form : Implements AnimatedObject
 #End Region
 
 #Region "DWM"
-
-
-#Region "Consts"
-    Private Const WM_NCLBUTTONDOWN As Integer = &HA1
-    Private HTNOWHERE As Integer = 0
-    Private HTCLIENT As Integer = 1
-    Private HTCAPTION As Integer = 2
-    Private HTGROWBOX As Integer = 4
-    Private HTSIZE As Integer = HTGROWBOX
-    Private HTMINBUTTON As Integer = 8
-    Private HTMAXBUTTON As Integer = 9
-    Private HTLEFT As Integer = 10
-    Private HTRIGHT As Integer = 11
-    Private HTTOP As Integer = 12
-    Private HTTOPLEFT As Integer = 13
-    Private HTTOPRIGHT As Integer = 14
-    Private HTBOTTOM As Integer = 15
-    Private HTBOTTOMLEFT As Integer = 16
-    Private HTBOTTOMRIGHT As Integer = 17
-    Private HTREDUCE As Integer = HTMINBUTTON
-    Private HTZOOM As Integer = HTMAXBUTTON
-    Private HTSIZEFIRST As Integer = HTLEFT
-    Private HTSIZELAST As Integer = HTBOTTOMRIGHT
-    Dim WM_NCCALCSIZE As Integer = &H83
-    Dim WM_NCHITTEST As Integer = &H84
-#End Region
-#Region "Fields"
-    <StructLayout(LayoutKind.Sequential)>
-    Public Structure MARGINS
-        Public cxLeftWidth As Integer
-        Public cxRightWidth As Integer
-        Public cyTopHeight As Integer
-        Public cyBottomHeight As Integer
-        Public Sub New(ByVal Left As Integer, ByVal Right As Integer, ByVal Top As Integer, ByVal Bottom As Integer)
-            Me.cxLeftWidth = Left
-            Me.cxRightWidth = Right
-            Me.cyTopHeight = Top
-            Me.cyBottomHeight = Bottom
-        End Sub
-    End Structure
-
     Private dwmMargins As MARGINS
     Private _marginOk As Boolean
-#End Region
-#Region "Methods"
-    Public Shared Function LoWord(ByVal dwValue As Integer) As Integer
-        Return dwValue And &HFFFF
-    End Function
-    ''' <summary>
-    ''' Equivalent to the HiWord C Macro
-    ''' </summary>
-    ''' <param name="dwValue"></param>
-    ''' <returns></returns>
-    Public Shared Function HiWord(ByVal dwValue As Integer) As Integer
-        Return (dwValue >> 16) And &HFFFF
-    End Function
-    <StructLayout(LayoutKind.Explicit)>
-    Public Structure RECT
-        ' Fields
-        <FieldOffset(12)>
-        Public bottom As Integer
-        <FieldOffset(0)>
-        Public left As Integer
-        <FieldOffset(8)>
-        Public right As Integer
-        <FieldOffset(4)>
-        Public top As Integer
-
-        ' Methods
-        Public Sub New(ByVal rect As Rectangle)
-            Me.left = rect.Left
-            Me.top = rect.Top
-            Me.right = rect.Right
-            Me.bottom = rect.Bottom
-        End Sub
-
-        Public Sub New(ByVal left As Integer, ByVal top As Integer, ByVal right As Integer, ByVal bottom As Integer)
-            Me.left = left
-            Me.top = top
-            Me.right = right
-            Me.bottom = bottom
-        End Sub
-
-        Public Sub [Set]()
-            Me.left = InlineAssignHelper(Me.top, InlineAssignHelper(Me.right, InlineAssignHelper(Me.bottom, 0)))
-        End Sub
-
-        Public Sub [Set](ByVal rect As Rectangle)
-            Me.left = rect.Left
-            Me.top = rect.Top
-            Me.right = rect.Right
-            Me.bottom = rect.Bottom
-        End Sub
-
-        Public Sub [Set](ByVal left As Integer, ByVal top As Integer, ByVal right As Integer, ByVal bottom As Integer)
-            Me.left = left
-            Me.top = top
-            Me.right = right
-            Me.bottom = bottom
-        End Sub
-
-        Public Function ToRectangle() As Rectangle
-            Return New Rectangle(Me.left, Me.top, Me.right - Me.left, Me.bottom - Me.top)
-        End Function
-
-        ' Properties
-        Public ReadOnly Property Height() As Integer
-            Get
-                Return (Me.bottom - Me.top)
-            End Get
-        End Property
-
-        Public ReadOnly Property Size() As Size
-            Get
-                Return New Size(Me.Width, Me.Height)
-            End Get
-        End Property
-
-        Public ReadOnly Property Width() As Integer
-            Get
-                Return (Me.right - Me.left)
-            End Get
-        End Property
-        Private Shared Function InlineAssignHelper(Of T)(ByRef target As T, ByVal value As T) As T
-            target = value
-            Return value
-        End Function
-    End Structure
-
-    <StructLayout(LayoutKind.Sequential)>
-    Public Structure NCCALCSIZE_PARAMS
-        Public rect0 As RECT, rect1 As RECT, rect2 As RECT
-        ' Can't use an array here so simulate one
-        Private lppos As IntPtr
-    End Structure
-    <DllImport("dwmapi.dll")>
-    Public Shared Function DwmDefWindowProc(ByVal hwnd As IntPtr, ByVal msg As Integer, ByVal wParam As IntPtr, ByVal lParam As IntPtr, ByRef result As IntPtr) As Integer
-    End Function
-    <DllImport("user32.dll")>
-    Public Shared Function ReleaseCapture() As Boolean
-    End Function
-    <DllImport("user32.dll")>
-    Public Shared Function SendMessage(ByVal hWnd As IntPtr, ByVal Msg As Integer, ByVal wParam As Integer, ByVal lParam As Integer) As Integer
-    End Function
-
-    Protected Overrides Sub OnMouseDown(ByVal e As MouseEventArgs)
-        If DesignMode Then Exit Sub
-        ms = 2
-        If Me.Width - BorderWidth > e.Location.X AndAlso
-                    e.Location.X > BorderWidth AndAlso e.Location.Y > BorderWidth Then
-            MoveControl(Me.Handle)
-        End If
-        MyBase.OnMouseDown(e)
-    End Sub
-    Private Sub MoveControl(ByVal hWnd As IntPtr)
-        If DesignMode Then Exit Sub
-        ReleaseCapture()
-        SendMessage(hWnd, WM_NCLBUTTONDOWN, HTCAPTION, 0)
-    End Sub
-#End Region
 #Region "Ctor"
     Public Sub New()
         Opacity = 0
@@ -192,7 +34,6 @@ Public Class CustomWindow : Inherits Form : Implements AnimatedObject
 #End Region
     Protected Overloads Overrides Sub WndProc(ByRef m As Message)
 
-
         Dim result As IntPtr
         Dim dwmHandled As Integer = DwmDefWindowProc(m.HWnd, m.Msg, m.WParam, m.LParam, result)
 
@@ -201,10 +42,8 @@ Public Class CustomWindow : Inherits Form : Implements AnimatedObject
             Exit Sub
         End If
 
-        If m.Msg = WM_NCCALCSIZE AndAlso CInt(m.WParam) = 1 Then
-            Dim nccsp As NCCALCSIZE_PARAMS =
-              DirectCast(Marshal.PtrToStructure(m.LParam,
-              GetType(NCCALCSIZE_PARAMS)), NCCALCSIZE_PARAMS)
+        If m.Msg = WindowsMessages.WmNcCalcSize AndAlso CInt(m.WParam) = 1 Then
+            Dim nccsp As NCCALCSIZE_PARAMS = Marshal.PtrToStructure(m.LParam, GetType(NCCALCSIZE_PARAMS))
 
             ' Adjust (shrink) the client rectangle to accommodate the border:
             nccsp.rect0.top += 0
@@ -228,8 +67,10 @@ Public Class CustomWindow : Inherits Form : Implements AnimatedObject
             m.Result = IntPtr.Zero
 
 
-        ElseIf m.Msg = WM_NCHITTEST AndAlso CInt(m.Result) = 0 Then
+        ElseIf m.Msg = WindowsMessages.WmNchitTest AndAlso CInt(m.Result) = 0 Then
             m.Result = HitTestNCA(m.HWnd, m.WParam, m.LParam)
+
+
         Else : MyBase.WndProc(m)
         End If
     End Sub
@@ -261,6 +102,21 @@ Public Class CustomWindow : Inherits Form : Implements AnimatedObject
 
         Return New IntPtr(HTCLIENT)
     End Function
+
+    Protected Overrides Sub OnMouseDown(ByVal e As MouseEventArgs)
+        If DesignMode Then Exit Sub
+        ms = 2
+        If Me.Width - BorderWidth > e.Location.X AndAlso
+                    e.Location.X > BorderWidth AndAlso e.Location.Y > BorderWidth Then
+            MoveControl(Me.Handle)
+        End If
+        MyBase.OnMouseDown(e)
+    End Sub
+    Private Sub MoveControl(ByVal hWnd As IntPtr)
+        If DesignMode Then Exit Sub
+        ReleaseCapture()
+        SendMessage(hWnd, WindowsMessages.WmNcLButtonDown, HTCAPTION, 0)
+    End Sub
     Protected Overrides Sub SetBoundsCore(x As Integer, y As Integer, width As Integer, height As Integer, specified As BoundsSpecified)
         If DesignMode Then MyBase.SetBoundsCore(x, y, width, height, specified)
     End Sub
@@ -310,9 +166,9 @@ Public Class CustomWindow : Inherits Form : Implements AnimatedObject
         Dim inp As New Interpolation
         Dim a!
         For j = 0 To 10
-            a = inp.GetValue(0, t, j, 10, Interpolation.Type.EaseIn, Interpolation.EasingMethods.Exponent, 3)
+            a = inp.GetValue(0, t, j, 10, Type.EaseIn, EasingMethods.Exponent, 3)
             g.DrawLine(Helpers.mp(col(a, 255)), 0, 31 - (10 - j), Width, 31 - (10 - j))
-            a = inp.GetValue(0, 128, j, 10, Interpolation.Type.EaseIn, Interpolation.EasingMethods.Exponent, 1)
+            a = inp.GetValue(0, 128, j, 10, Type.EaseIn, EasingMethods.Exponent, 1)
             g.DrawLine(Helpers.mp(col(a, 0)), 0, 34 + (10 - j), Width, 34 + (10 - j))
         Next
 
@@ -324,7 +180,7 @@ Public Class CustomWindow : Inherits Form : Implements AnimatedObject
 
 
         For i! = 0 To 23
-            a = inp.GetValue(0, 128, i, 50, Interpolation.Type.Smootherstep, 3)
+            a = inp.GetValue(0, 128, i, 50, Type.Smootherstep, 3)
             g.DrawLine(New Pen(col(a * 2, 0)), 0, Height - 3 - 23 + i, Width, Height - 3 - 23 + i)
         Next 'shadows
 
@@ -374,8 +230,8 @@ Public Class CustomWindow : Inherits Form : Implements AnimatedObject
         Invalidate()
     End Sub
     Protected Overrides Sub OnResize(e As EventArgs)
+        Invalidate()
         MyBase.OnResize(e)
-        cbx = 0
     End Sub
     Public Sub leavemouse(e As EventArgs) Implements AnimatedObject.leavemouse
         Me.OnMouseLeave(e)
@@ -1417,7 +1273,7 @@ End Class ' DISPOSE done
 ''    If Not fxt = 0 Then Exit Sub
 ''    If Opacity < 1 Then
 ''        If ot < 5000 Then
-''            Opacity = lf.GetValue(0, 1, ot, 5000, Interpolation.Type.EaseOut, Interpolation.EasingMethods.Exponent, 1)
+''            Opacity = lf.GetValue(0, 1, ot, 5000, Type.EaseOut, EasingMethods.Exponent, 1)
 ''            op = Opacity
 ''            ot += 1
 ''        Else
@@ -1434,7 +1290,7 @@ End Class ' DISPOSE done
 '    If Not fxt = 1 Then Exit Sub
 '    If Opacity > 0 Then
 '        If ot < 300 Then
-'            Opacity = lf1.GetValue(1, 0, ot, 300, Interpolation.Type.EaseOut, Interpolation.EasingMethods.Exponent, 1.5)
+'            Opacity = lf1.GetValue(1, 0, ot, 300, Type.EaseOut, EasingMethods.Exponent, 1.5)
 '            op = Opacity
 '            ot += 1
 '        Else

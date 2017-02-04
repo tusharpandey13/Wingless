@@ -78,9 +78,6 @@
     </Compile>
     <Compile Include="custom\BitBliter.vb" />
     <Compile Include="custom\Brag.vb" />
-    <Compile Include="custom\CustomControlBox.vb">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="custom\Helpers.vb" />
     <Compile Include="custom\customShadow.vb">
       <SubType>Form</SubType>
@@ -92,9 +89,6 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="custom\Custom_Checkbox_Radiobutton.vb">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="custom\custom_Numeric.vb">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="custom\Custom_Progresses.vb">
@@ -111,6 +105,7 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="custom\Timer.vb" />
+    <Compile Include="custom\consts.vb" />
     <Compile Include="Form1.Designer.vb">
       <DependentUpon>Form1.vb</DependentUpon>
     </Compile>

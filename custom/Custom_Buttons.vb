@@ -11,8 +11,6 @@ Class custom_Material_Button
     Dim hc As Color = col(0, 0)
     Private w! = 0.0
     Dim iso! = 0
-    Dim tb As SolidBrush
-    Dim bt As Bitmap : Dim tg As Graphics
     Private fc As Color = col(100, 0) : <System.ComponentModel.Category("Appearance")> Public Property FloodColor As Color
         Get
             Return fc
@@ -67,7 +65,7 @@ Class custom_Material_Button
 
     Public Function retdata() As drawdata
         calc()
-        Dim dd As drawdata
+        Dim dd As drawdata = New drawdata
         dd.colorparam = {col(Math.Abs(150 * (1.5 - (w / (total + 0.001)))), FloodColor), hc}
         dd.rctparam = {rct(x - w, y - w, w * 2, w * 2)}
         Return dd
@@ -78,8 +76,8 @@ Class custom_Material_Button
         If isd = 1 Then
             If Not t >= 1000 Then
                 t += 1
-                w = GetValue(0, total, t, 1000, Interpolation.Type.SmoothStep, EasingMethods.Exponent, 0.65)
-                'w = GetValue(0, total, t, 1000, Interpolation.Type.EaseOut, EasingMethods.Exponent, 0.65)
+                w = GetValue(0, total, t, 1000, Type.SmoothStep, EasingMethods.Exponent, 0.65)
+                'w = GetValue(0, total, t, 1000, Type.EaseOut, EasingMethods.Exponent, 0.65)
             Else
                 t = 0
                 w = 0.0
@@ -91,7 +89,7 @@ Class custom_Material_Button
         If iso = 1 Then
             If t1 < 400 Then
                 t1 += 1
-                hc = col(GetValue(0, 25, t1, 400, Interpolation.Type.SmoothStep, EasingMethods.Exponent, 0.65), rescol(BackColor))
+                hc = col(GetValue(0, 25, t1, 400, Type.SmoothStep, EasingMethods.Exponent, 0.65), rescol(BackColor))
             Else
                 t1 = 0 : iso = 0
                 If isd = 0 Then animating = False
@@ -99,7 +97,7 @@ Class custom_Material_Button
         ElseIf iso = 2 Then
             If t1 < 250 Then
                 t1 += 1
-                hc = col(GetValue(25, 0, t1, 250, Interpolation.Type.SmoothStep, EasingMethods.Exponent, 0.65), rescol(BackColor))
+                hc = col(GetValue(25, 0, t1, 250, Type.SmoothStep, EasingMethods.Exponent, 0.65), rescol(BackColor))
             Else
                 t1 = 0 : iso = 0
                 If isd = 0 Then animating = False
@@ -128,7 +126,7 @@ End Class
 
 Class CustomButton : Inherits customControl
 #Region "declare"
-    Dim tp As Pen : Dim tg, t1g As Graphics : Dim tgb As LinearGradientBrush
+    Dim tg, t1g As Graphics
     Dim cx, cy As Single
     Dim ms%
     Dim bt, bt1, sb As Bitmap
@@ -151,9 +149,9 @@ Class CustomButton : Inherits customControl
     Protected Overrides Sub PaintHook()
         If animating Then calc()
         G.Clear(Parent.BackColor)
-        If DesignMode Then G.InterpolationMode = 7 : G.DrawImageUnscaled(retbit(), 0, 0)
+        If DesignMode Then G.InterpolationMode = 7 : G.DrawImageUnscaled(returnbitmap(), 0, 0)
         G.InterpolationMode = 7
-        G.DrawImageUnscaled(retbit(), 0, 0)
+        G.DrawImageUnscaled(returnbitmap(), 0, 0)
     End Sub
     Sub calc()
         If t < 100 Then
@@ -172,7 +170,7 @@ Class CustomButton : Inherits customControl
 #End Region
 
 
-    Public Function retbit() As Bitmap
+    Public Function returnbitmap() As Bitmap
 
         Dim db% = 0 : If rescol(BackColor) = Color.White Then db = 1 Else db = 0
         Dim go% = 20 : Dim gs% = 0
@@ -208,10 +206,10 @@ Class CustomButton : Inherits customControl
             .FillRectangle(mb(BackColor), rct(1, 1, Width - 2, Height - 3))
 
             .SmoothingMode = 2
-            tgb = New LinearGradientBrush(rct(Me), col(go, gs), col(0, 0), 45.0F)
-            .FillRectangle(tgb, rct(1, 1, Width - 2, Height - 3))
-            tgb = New LinearGradientBrush(rct(Me), col(10, 0), col(0, 0), 90.0F)
-            .FillRectangle(tgb, rct(1, 1, Width - 2, Height - 3))
+            tb = New LinearGradientBrush(rct(Me), col(go, gs), col(0, 0), 45.0F)
+            .FillRectangle(tb, rct(1, 1, Width - 2, Height - 3))
+            tb = New LinearGradientBrush(rct(Me), col(10, 0), col(0, 0), 90.0F)
+            .FillRectangle(tb, rct(1, 1, Width - 2, Height - 3))
 
             mp(BackColor, tp)
 
@@ -251,7 +249,7 @@ Class CustomButton : Inherits customControl
         tg.DrawImageUnscaled(bt1, 0, 0)
 
 
-        t1g.Dispose() : tp.Dispose() : tgb.Dispose() : tg.Dispose() : bt1.Dispose()
+        t1g.Dispose() : tg.Dispose() : bt1.Dispose()
         Return bt
         bt.Dispose()
     End Function

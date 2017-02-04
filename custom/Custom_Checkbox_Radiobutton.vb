@@ -101,7 +101,7 @@ End Class 'DISPOSE LEFT
     Dim x! = -16 : Public fx! = -16 : Public ix! = -16
     Dim rd As New Bitmap(16 * 4, 16 * 4)
     Dim rdb As New Bitmap(16 * 4, 16 * 4)
-    Dim LGB : Dim lg2
+    Dim lg2
 
 #Region "props"
     Dim _checked As Boolean = False
@@ -134,8 +134,8 @@ End Class 'DISPOSE LEFT
         With Graphics.FromImage(rd)
             .SmoothingMode = 2 : .InterpolationMode = 7 : .CompositingQuality = 2
             .Clear(Color.Transparent)
-            LGB = New LinearGradientBrush(New Rectangle(0, 0, 64, 64), col(51, rescol(Parent.BackColor)), col(75, rescol(Parent.BackColor)), 90.0F)
-            .FillEllipse(LGB, 0, 0, 60, 60)
+            tb = New LinearGradientBrush(New Rectangle(0, 0, 64, 64), col(51, rescol(Parent.BackColor)), col(75, rescol(Parent.BackColor)), 90.0F)
+            .FillEllipse(tb, 0, 0, 60, 60)
             ' .DrawArc(New Pen(col(255, Color.Black)), 0, 8, 60, 60, -180, 180)
             .DrawArc(New Pen(col(160, invert(rescol(Parent.BackColor)))), 0, 0, 60, 60, 0, 360)
         End With
@@ -167,8 +167,8 @@ End Class 'DISPOSE LEFT
     Sub calc()
         If t < 300 Then
             t += 1
-            x = GetValue(ix, fx, t, 300, Interpolation.Type.Smootherstep, 1)
-            y = GetValue(iy, fy, t, 300, Interpolation.Type.Smootherstep, 1)
+            x = GetValue(ix, fx, t, 300, Type.Smootherstep, 1)
+            y = GetValue(iy, fy, t, 300, Type.Smootherstep, 1)
         Else : animating = False
         End If
     End Sub
@@ -214,7 +214,7 @@ End Class
 <DefaultEvent("CheckedChanged"), DesignTimeVisible(False)> Class toggler : Inherits customControl
 #Region "Declare"
     Dim x! : Dim t! : Dim fd% = 0
-    Dim p As Pen : Dim br As SolidBrush : Dim hb, hb1, hb2 As New Bitmap(18 * 8, 30 * 8)
+    Dim hb, hb1, hb2 As New Bitmap(18 * 8, 30 * 8)
     Public Event CheckedChanged()
     Dim mdown As Boolean = False
     Private hr As Rectangle
@@ -257,13 +257,13 @@ End Class
 
         G.Clear(Parent.BackColor)
         G.SmoothingMode = 2 : G.InterpolationMode = 7
-        If fd = 1 Then mb(ic(_fc, 50), br) Else mb(col(200, rescol(Parent.BackColor)), br)
+        If fd = 1 Then mb(ic(_fc, 50), tb) Else mb(col(200, rescol(Parent.BackColor)), tb)
         G.PixelOffsetMode = 2
 
-        G.FillRectangle(br, New Rectangle(6, 10, 28, 10))
+        G.FillRectangle(tb, New Rectangle(6, 10, 28, 10))
         G.SetClip(New Rectangle(6, 10, 28, 10), CombineMode.Exclude)
-        G.FillEllipse(br, New Rectangle(1, 10, 10, 10))
-        G.FillEllipse(br, New Rectangle(29, 10, 10, 10))
+        G.FillEllipse(tb, New Rectangle(1, 10, 10, 10))
+        G.FillEllipse(tb, New Rectangle(29, 10, 10, 10))
         G.ResetClip()
 
         hr = rct(x, 4, 18, 30)
@@ -324,7 +324,7 @@ End Class
     Private Sub animlogic()
         If Not animating Then Exit Sub
         If t < 500 Then
-            x = GetValue(x, fd * (Width - 18), t, 500, Interpolation.Type.EaseInOut, Interpolation.EasingMethods.Regular, 5)
+            x = GetValue(x, fd * (Width - 18), t, 500, Type.EaseInOut, EasingMethods.Regular, 5)
             t += 1
         Else
             animating = False
@@ -343,17 +343,17 @@ End Class
             .Clear(col(0, 0))
             .InterpolationMode = 7 : .SmoothingMode = 2 : .PixelOffsetMode = 2
 
-            mb(col(48, 0), br)
-            .FillEllipse(br, 4, 8, 18 * 8 - 4, 18 * 8)
-            mb(col(40, 0), br)
-            .FillEllipse(br, 4, 16, 18 * 8 - 4, 18 * 8)
-            mb(col(24, 0), br)
-            .FillEllipse(br, 4, 24, 18 * 8 - 4, 18 * 8)
+            mb(col(48, 0), tb)
+            .FillEllipse(tb, 4, 8, 18 * 8 - 4, 18 * 8)
+            mb(col(40, 0), tb)
+            .FillEllipse(tb, 4, 16, 18 * 8 - 4, 18 * 8)
+            mb(col(24, 0), tb)
+            .FillEllipse(tb, 4, 24, 18 * 8 - 4, 18 * 8)
 
 
 
-            If fd = 1 Then mb(_fc, br) Else mb(col(120), br)
-            .FillEllipse(br, 1, 1, 18 * 8 - 2, 18 * 8 - 2)
+            If fd = 1 Then mb(_fc, tb) Else mb(col(120), tb)
+            .FillEllipse(tb, 1, 1, 18 * 8 - 2, 18 * 8 - 2)
         End With
     End Sub
     Public Function getfd() As Integer
@@ -366,7 +366,6 @@ End Class
 #Region "Declare"
     Public Event CheckedChanged(sender As Object)
     Private t As New toggler(_tc, _chk)
-    Private tb As SolidBrush
     Private _tc As Color = col(0, 90, 190) : <Category("Appearance")> Public Property ToggleColor As Color
         Get
             Return _tc
@@ -403,7 +402,6 @@ End Class
         G.Clear(BackColor)
         mb(col(_tc, t.getfd(), ForeColor, LimitingType.NotLessThan), tb)
         G.DrawString(Text, Font, tb, 5, 7)
-        tb.Dispose()
     End Sub
     Protected Overrides Sub OnClick(e As EventArgs)
         MyBase.OnClick(e)

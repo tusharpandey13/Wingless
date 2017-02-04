@@ -1,5 +1,4 @@
-﻿Imports WindowsApplication3
-
+﻿
 Class CustomTab : Inherits TabControl : Implements AnimatedObject
 #Region "DECLARE"
     Private bb As Bitmap = New Bitmap(1, 1)
@@ -84,7 +83,7 @@ Class CustomTab : Inherits TabControl : Implements AnimatedObject
         Invalidate()
     End Sub
     Protected Overrides Sub OnPaint(ByVal e As PaintEventArgs)
-        calc()
+        'calc()
 
         Dim B As New Bitmap(Width, Height)
         Dim G As Graphics = Graphics.FromImage(B)
@@ -103,15 +102,15 @@ Class CustomTab : Inherits TabControl : Implements AnimatedObject
             End If
         Next
 
-        If animating Then
-            G.DrawImage(bo, x, SelectedTab.Top)
-            G.DrawImage(bn, x + (-1) * sign * Width, SelectedTab.Top)
-        End If
+        'If animating Then
+        '    G.DrawImage(bo, x, SelectedTab.Top)
+        '    G.DrawImage(bn, x + (-1) * sign * Width, SelectedTab.Top)
+        'End If
 
-        e.Graphics.DrawImage(B.Clone, 0, 0)
-        If tabchanged = 0 Then
-            Graphics.FromImage(bo).DrawImage(copygraphics(Me, SelectedTab.DisplayRectangle), 0, 0)
-        End If
+        'e.Graphics.DrawImage(B.Clone, 0, 0)
+        'If tabchanged = 0 Then
+        '    Graphics.FromImage(bo).DrawImage(copygraphics(Me, SelectedTab.DisplayRectangle), 0, 0)
+        'End If
         G.Dispose() : B.Dispose()
     End Sub
 
@@ -130,24 +129,25 @@ Class CustomTab : Inherits TabControl : Implements AnimatedObject
     'End Sub
     Private x!, t%, sign%
     Sub calc()
-        If Not animating Then Return
+        'If Not animating Then Return
 
-        If t < 100 Then
-            x = int.GetValue(0, Width * sign, t, 100, Interpolation.Type.SmoothStep, 1)
-            t += 1
-        Else
-            animating = 0
-            oi = SelectedIndex
-            x = 0
-            SelectedTab.Show()
-            Graphics.FromImage(bo).DrawImage(copygraphics(Me, SelectedTab.DisplayRectangle), 0, 0)
-        End If
+        'If t < 100 Then
+        '    x = int.GetValue(0, Width * sign, t, 100, Type.SmoothStep, 1)
+        '    t += 1
+        'Else
+        '    animating = 0
+        '    oi = SelectedIndex
+        '    x = 0
+        '    SelectedTab.Show()
+        '    Graphics.FromImage(bo).DrawImage(copygraphics(Me, SelectedTab.DisplayRectangle), 0, 0)
+        'End If
     End Sub
     Protected Overrides Sub Dispose(disposing As Boolean)
         MyBase.Dispose(disposing)
         'animatedobjects.Remove(Me)
     End Sub
     Public Sub leavemouse(e As EventArgs) Implements AnimatedObject.leavemouse
+        OnMouseLeave(e)
     End Sub
 
     Private Sub custom_invalidate() Implements AnimatedObject.invalidate

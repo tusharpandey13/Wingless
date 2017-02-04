@@ -4,38 +4,6 @@ Imports System.Drawing.Imaging
 Imports System.Runtime.InteropServices
 #End Region
 Module Helpers
-
-#Region " Variables"
-    Friend NearSF As New StringFormat() With {.Alignment = StringAlignment.Near, .LineAlignment = StringAlignment.Near}
-    Friend CenterSF As New StringFormat() With {.Alignment = StringAlignment.Center, .LineAlignment = StringAlignment.Center}
-    ''' <summary>
-    ''' The types of limiting applied.
-    ''' </summary>
-    Public Enum LimitingType
-        ''' <summary>
-        ''' The r, g, b values of the resultant color cannot be less than those of the limiting color specifyied.
-        ''' </summary>
-        NotLessThan
-        ''' <summary>
-        ''' The r, g, b values of the resultant color cannot be more than those of the limiting color specifyied.
-        ''' </summary>
-        NotGreaterThan
-    End Enum
-    Public Structure drawdata
-        Dim bitmapparam() As Bitmap
-        Dim singleparam() As Single
-        Dim info As String
-        Dim rctparam() As Rectangle
-        Dim penparam() As Pen
-        Dim brushparam() As Brush
-        Dim gbparam() As LinearGradientBrush
-        Dim colorparam() As Color
-        Dim ptparam() As Point
-    End Structure
-
-    Friend SRCCOPY As Integer = &HCC0020
-#End Region
-
 #Region " Functions"
 
 
@@ -122,7 +90,8 @@ Module Helpers
 
 #End Region
 
-#Region "Pen & Brush"
+#Region "Pens"
+#Region "ByRef"
     Friend Sub mp(c As Color, ByRef p As Pen)
         p = New Pen(c)
     End Sub
@@ -135,6 +104,8 @@ Module Helpers
     Friend Sub mp(br As Brush, w!, ByRef p As Pen)
         p = New Pen(br, w)
     End Sub
+#End Region
+
     Friend Function mp(br As Brush, w!) As Pen
         Return New Pen(br, w)
     End Function
@@ -254,55 +225,10 @@ Module Helpers
      ByVal hdcSrc As IntPtr, ByVal nXSrc As Integer, ByVal nYSrc As Integer,
      ByVal dwRop As Integer) As Boolean
 
-    Friend Function copygraphics(s As Control, srcrect As Rectangle) As Bitmap
-        Dim tb As New Bitmap(srcrect.Width, srcrect.Height)
-        Dim sg As Graphics = s.CreateGraphics
-        Dim tbg As Graphics = Graphics.FromImage(tb)
-
-        BitBlt(tbg.GetHdc, 0, 0, srcrect.Width, srcrect.Height, sg.GetHdc, srcrect.X, srcrect.Y, SRCCOPY)
-
-        sg.ReleaseHdc() : tbg.ReleaseHdc()
-        tbg.Dispose() : sg.Dispose()
-        Return tb
-    End Function
-
-    Public Sub DetectColorWithMarshal(ByVal image As Bitmap, ByVal searchedR As Byte, ByVal searchedG As Byte, ByVal searchedB As Integer, ByVal tolerance As Integer)
-        Dim imageData As BitmapData = image.LockBits(New Rectangle(0, 0, image.Width, image.Height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb)
-
-        Dim imageBytes(Math.Abs(imageData.Stride) * image.Height - 1) As Byte
-        Dim scan0 As IntPtr = imageData.Scan0
-
-        Marshal.Copy(scan0, imageBytes, 0, imageBytes.Length)
-
-        Dim unmatchingValue As Byte = 0
-        Dim matchingValue As Byte = 255
-        Dim toleranceSquared As Integer = tolerance * tolerance
-
-        For i As Integer = 0 To imageBytes.Length - 1 Step 3
-            Dim pixelB As Byte = imageBytes(i)
-            Dim pixelR As Byte = imageBytes(i + 2)
-            Dim pixelG As Byte = imageBytes(i + 1)
-
-            Dim diffR As Integer = pixelR - searchedR
-            Dim diffG As Integer = pixelG - searchedG
-            Dim diffB As Integer = pixelB - searchedB
-
-            Dim distance As Integer = diffR * diffR + diffG * diffG + diffB * diffB
-
-            imageBytes(i + 2) = If(distance > toleranceSquared, unmatchingValue, matchingValue)
-            imageBytes(i + 1) = imageBytes(i + 2)
-            imageBytes(i) = imageBytes(i + 1)
-        Next i
-
-        Marshal.Copy(imageBytes, 0, scan0, imageBytes.Length)
-
-        image.UnlockBits(imageData)
-    End Sub
-
 #End Region
 
 #Region "Gradient"
-    Function grad(r As Rectangle, c1 As Color, c2 As Color, type As Interpolation.Type, method As Interpolation.EasingMethods, pow!, Optional sm% = 0, Optional im% = 7) As Bitmap
+    Function grad(r As Rectangle, c1 As Color, c2 As Color, type As Type, method As EasingMethods, pow!, Optional sm% = 0, Optional im% = 7) As Bitmap
         Dim b As New Bitmap(r.Width, r.Height)
         Dim int As New Interpolation()
         Dim p As New Pen(Color.Transparent)
@@ -429,7 +355,9 @@ Module Helpers
             Return False
         Loop
     End Function
+
 #End Region
+
 
 
 #End Region
