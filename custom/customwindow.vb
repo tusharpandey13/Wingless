@@ -19,6 +19,16 @@ Public Class CustomWindow : Inherits Form : Implements AnimatedObject
             Return DesignMode
         End Get
     End Property
+    Dim _cp As Boolean = True : Public Property custompaint As Boolean
+        Get
+            Return _cp
+        End Get
+        Set(value As Boolean)
+            _cp = value
+            Invalidate()
+        End Set
+    End Property
+    Public Property fordesign As Boolean
 #End Region
 
 #Region "DWM"
@@ -31,6 +41,7 @@ Public Class CustomWindow : Inherits Form : Implements AnimatedObject
         DoubleBuffered = True
         FormBorderStyle = FormBorderStyle.None
     End Sub
+
 #End Region
     Protected Overloads Overrides Sub WndProc(ByRef m As Message)
 
@@ -67,9 +78,16 @@ Public Class CustomWindow : Inherits Form : Implements AnimatedObject
             m.Result = IntPtr.Zero
 
 
-        ElseIf m.Msg = WindowsMessages.WmNchitTest AndAlso CInt(m.Result) = 0 Then
+        ElseIf m.Msg = WindowsMessages.WmNchitTest AndAlso CInt(m.Result) = 0 AndAlso custompaint Then
             m.Result = HitTestNCA(m.HWnd, m.WParam, m.LParam)
 
+        ElseIf m.Msg = WindowsMessages.WmSetFocus Then
+            gotfocus_()
+            MyBase.WndProc(m)
+
+        ElseIf m.Msg = WindowsMessages.WmKillFocus Then
+            lostfocus_()
+            MyBase.WndProc(m)
 
         Else : MyBase.WndProc(m)
         End If
@@ -104,21 +122,22 @@ Public Class CustomWindow : Inherits Form : Implements AnimatedObject
     End Function
 
     Protected Overrides Sub OnMouseDown(ByVal e As MouseEventArgs)
-        If DesignMode Then Exit Sub
+        If DesignMode And Not fordesign Then Exit Sub
         ms = 2
         If Me.Width - BorderWidth > e.Location.X AndAlso
                     e.Location.X > BorderWidth AndAlso e.Location.Y > BorderWidth Then
             MoveControl(Me.Handle)
         End If
         MyBase.OnMouseDown(e)
+        mdown()
     End Sub
     Private Sub MoveControl(ByVal hWnd As IntPtr)
-        If DesignMode Then Exit Sub
+        If DesignMode And Not fordesign Then Exit Sub
         ReleaseCapture()
         SendMessage(hWnd, WindowsMessages.WmNcLButtonDown, HTCAPTION, 0)
     End Sub
     Protected Overrides Sub SetBoundsCore(x As Integer, y As Integer, width As Integer, height As Integer, specified As BoundsSpecified)
-        If DesignMode Then MyBase.SetBoundsCore(x, y, width, height, specified)
+        If DesignMode And Not fordesign Then MyBase.SetBoundsCore(x, y, width, height, specified)
     End Sub
 
 #End Region
@@ -136,7 +155,10 @@ Public Class CustomWindow : Inherits Form : Implements AnimatedObject
         Dim d As Boolean = 0
         g.Clear(BackColor) 'prep
 
-
+        If Not _cp Then
+            tp.Dispose() : tb.Dispose()
+            Return
+        End If
 
         If rescol(BackColor) = Color.White Then
             'dark
@@ -213,6 +235,8 @@ Public Class CustomWindow : Inherits Form : Implements AnimatedObject
         g.DrawString(Text, Font, mb(BackColor), 10, 10)
 
         tp.Dispose() : tb.Dispose()
+
+        paint_(e)
     End Sub
     Protected Overrides Sub OnMouseMove(e As MouseEventArgs)
         ms = 1
@@ -228,10 +252,12 @@ Public Class CustomWindow : Inherits Form : Implements AnimatedObject
         Else : cbx = 0
         End If
         Invalidate()
+        mmove()
     End Sub
     Protected Overrides Sub OnResize(e As EventArgs)
         Invalidate()
         MyBase.OnResize(e)
+        resize_()
     End Sub
     Public Sub leavemouse(e As EventArgs) Implements AnimatedObject.leavemouse
         Me.OnMouseLeave(e)
@@ -244,46 +270,46 @@ Public Class CustomWindow : Inherits Form : Implements AnimatedObject
 #Region "FORM LOADING and CLOSING"
     Private Sub me_Load(sender As Object, e As EventArgs) Handles Me.Load
         Opacity = 1
-        If DesignMode Then
-            FormBorderStyle = FormBorderStyle.None
-        Else
-            Shadow.BackColor = Color.Black
-            Shadow.Visible = 1
+        Shadow.BackColor = Color.Black
+        Shadow.Visible = 1
+        If Not DesignMode Then
             FormBorderStyle = FormBorderStyle.Sizable
-            fxt = 0
-            Top = (Screen.PrimaryScreen.WorkingArea.Height - Height)
+        Else
+            FormBorderStyle = 0
         End If
-        MinimumSize = New Size(100, 34)
 
-        TransparencyKey = Color.Fuchsia
+        MinimumSize = New Size(120, 34)
+
+        If custompaint Then TransparencyKey = Color.Fuchsia
         StartPosition = FormStartPosition.CenterScreen
+        load_()
     End Sub
-    '    Private Sub CustomWindow_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
-    '        e.Cancel = True
-    '        Shadow.Hide()
-    '        Shadow.Visible = False
-    '        Shadow.Dispose()
-    '        For Each c As Control In Controls
-    '            c.Dispose()
-    '        Next
-    '        fxt = 1
+    Private Sub CustomWindow_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
+        e.Cancel = True
+        Shadow.Hide()
+        Shadow.Visible = False
+        Shadow.Dispose()
+        For Each c As Control In Controls
+            c.Dispose()
+        Next
+        'fxt = 1
 
 
-    '        '_________________̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲
-    '        'End the process  ͟___________________________________________________̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲ 
-    '        '‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾																													
-    '        Dim PR() As Process = Process.GetProcessesByName("magnify") '            
-    '        For Each Process As Process In PR '                                                    
-    '            On Error GoTo e  '    '                                                                
-    '            Process.Kill() '                                                                                 
-    '        Next '																 ̲ ̲  FUCK YOU MAGNIFYIER ̲͟͟͟͟͟͟͟͟͟͟͟͟͟͟͟͟͟͟͟͟͟͟ ̲̲̲̲ 
-    '        '																	  ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾	 
-    '        '̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅‾̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅‾̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅‾̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅‾̅̅‾̅̅‾̅̅‾̅̅‾̅̅‾̅̅‾̅̅‾̅̅‾̅̅‾̅̅‾̅̅‾̅̅‾̅̅̅ ̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅
+        '_________________̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲
+        'End the process  ͟___________________________________________________̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲̲ 
+        '‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾																													
+        Dim PR() As Process = Process.GetProcessesByName("magnify") '            
+        For Each Process As Process In PR '                                                    
+            On Error GoTo e  '    '                                                                
+            Process.Kill() '                                                                                 
+        Next '																 ̲ ̲  FUCK YOU MAGNIFYIER ̲͟͟͟͟͟͟͟͟͟͟͟͟͟͟͟͟͟͟͟͟͟͟ ̲̲̲̲ 
+        '																	  ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾	 
+        '̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅‾̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅‾̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅‾̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅̅ ̅̅‾̅̅‾̅̅‾̅̅‾̅̅‾̅̅‾̅̅‾̅̅‾̅̅‾̅̅‾̅̅‾̅̅‾̅̅‾̅̅̅ ̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅̅
 
 
-    'e:
-    '        Me.AccessibleDescription = "Animated Form"
-    '    End Sub
+e:
+        close_()
+    End Sub
     Protected Overrides Sub Dispose(disposing As Boolean)
         MyBase.Dispose(disposing)
         'animatedforms.Remove(Me)
@@ -386,8 +412,6 @@ Public Class CustomWindow : Inherits Form : Implements AnimatedObject
     End Class
     'above by blackcap
 #End Region
-
-
 
 #Region "CONTROL BOX"
 
@@ -777,11 +801,31 @@ Public Class CustomWindow : Inherits Form : Implements AnimatedObject
 
         MyBase.OnCreateControl()
 
-    End Sub
+        create()
 
+    End Sub
 #End Region
 
-
+#Region "Overridables"
+    Protected Overridable Sub load_()
+    End Sub
+    Protected Overridable Sub close_()
+    End Sub
+    Protected Overridable Sub paint_(e As PaintEventArgs)
+    End Sub
+    Protected Overridable Sub resize_()
+    End Sub
+    Protected Overridable Sub mdown()
+    End Sub
+    Protected Overridable Sub mmove()
+    End Sub
+    Protected Overridable Sub lostfocus_()
+    End Sub
+    Protected Overridable Sub gotfocus_()
+    End Sub
+    Protected Overridable Sub create()
+    End Sub
+#End Region
 
 
 

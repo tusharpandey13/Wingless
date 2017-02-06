@@ -91,26 +91,46 @@ Module Helpers
         Return col(CByte(CInt(c1.R) * r + CInt(c2.R) * (1 - r)), CByte(CInt(c1.G) * r + CInt(c2.G) * (1 - r)), CByte(CInt(c1.B) * r + CInt(c2.B) * (1 - r)))
     End Function
     Friend Function hsltorgb(h!, s!, l!) As Color
-        Dim c!, x!, m!
+        Dim c!, k!, m!
         c = (1 - Math.Abs(2 * l - 1)) * s
-        x = c * (1 - Math.Abs(((h / 60) Mod 2) - 1))
+        k = c * (1 - Math.Abs(((h / 60) Mod 2) - 1))
         m = l - c / 2
-        Return cyltorgb(c, x, m, h)
+        Return cyltorgb(c, k, m, h)
     End Function
     Friend Function hsvtorgb(h!, s!, v!) As Color
-        Dim c!, x!, m!
+        Dim c!, k!, m!
         c = v * s
-        x = c * (1 - Math.Abs(((h / 60) Mod 2) - 1))
+        k = c * (1 - Math.Abs(((h / 60) Mod 2) - 1))
         m = v - c
-        Return cyltorgb(c, x, m, h)
+        Return cyltorgb(c, k, m, h)
     End Function
-    Private Function cyltorgb(c!, x!, m!, h!) As Color
-        Dim rd() = {c, x, 0, 0, x, c}
-        Dim gd() = {x, c, c, x, 0, 0}
-        Dim bd() = {0, 0, x, c, c, x}
+    Private Function cyltorgb(c!, k!, m!, h!) As Color
+        Dim rd() = {c, k, 0, 0, k, c}
+        Dim gd() = {k, c, c, k, 0, 0}
+        Dim bd() = {0, 0, k, c, c, k}
         Dim t = Math.Ceiling(h / 60)
         If t <= 0 Then t = 0 Else t -= 1
         Return col((rd(t) + m) * 255, (gd(t) + m) * 255, (bd(t) + m) * 255)
+    End Function
+
+    Friend Function rgbtohsv(r!, g!, b!) As Single()
+        Dim cmax!, cmin!, rd!, gd!, bd!, del!
+        Dim h!, s!, v!
+
+        rd = r / 255 : gd = g / 255 : bd = b / 255
+        cmax = Math.Max(Math.Max(rd, gd), bd)
+        cmin = Math.Min(Math.Min(rd, gd), bd)
+        del = cmax - cmin
+
+        If cmax = rd Then h = 60 * (((gd - bd) / del) Mod 6)
+        If cmax = gd Then h = 60 * ((bd - rd) / del + 2)
+        If cmax = bd Then h = 60 * ((rd - gd) / del + 4)
+
+        If cmax = 0 Then s = 0 Else s = del / cmax
+
+        v = cmax
+
+        Return {h, s, v}
     End Function
 #End Region
 
@@ -382,7 +402,11 @@ Module Helpers
 
 #End Region
 
-
+#Region "Math!"
+    Public Function clamp#(v#, l#, h#)
+        Return Math.Min(h, Math.Max(l, v))
+    End Function
+#End Region
 
 #End Region
 

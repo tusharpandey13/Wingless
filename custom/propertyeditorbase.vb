@@ -1,16 +1,14 @@
-﻿Imports System.Drawing.Design
+﻿Imports System.ComponentModel
+Imports System.Drawing.Design
+Imports System.Drawing.Drawing2D
 Imports System.Windows.Forms.Design
-Imports System.ComponentModel
-
-
 ''' <summary> 
-''' This is a UITypeEditor base class usefull for simple editing of control 
+''' This is a UITypeEditor base class usefull for sihelpers.mple editing of control 
 ''' properties in a DropDown or a ModalForm window at design mode (in 
 ''' Visual Studio IDE). To use this, inherits a class from it and add this
 ''' attribute to your control property(ies): 
 ''' <Editor(GetType(MyPropertyEditor), GetType(System.Drawing.Design.UITypeEditor))></Editor>
 ''' </summary>
-
 Public MustInherit Class PropertyEditorBase
     Inherits System.Drawing.Design.UITypeEditor
 

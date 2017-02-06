@@ -265,6 +265,7 @@ MustInherit Class customControl
 #End Region
 
 #Region " State Handling "
+    Dim isdown% = 0
     Protected Overrides Sub OnMouseEnter(ByVal e As EventArgs)
         InPosition = True
         SetState(MouseState.Over)
@@ -280,12 +281,14 @@ MustInherit Class customControl
         OnMouseLeave(e)
     End Sub
     Protected Overrides Sub OnMouseUp(ByVal e As MouseEventArgs)
-        If InPosition Then SetState(MouseState.Over)
         MyBase.OnMouseUp(e)
+        If InPosition Then SetState(MouseState.Over)
+        isdown = 0
     End Sub
     Protected Overrides Sub OnMouseDown(ByVal e As MouseEventArgs)
-        If e.Button = MouseButtons.Left Then SetState(MouseState.Down)
         MyBase.OnMouseDown(e)
+        If e.Button = MouseButtons.Left Then SetState(MouseState.Down)
+        isdown = 1
     End Sub
     Protected Overrides Sub OnMouseLeave(ByVal e As EventArgs)
         InPosition = False
@@ -299,6 +302,12 @@ MustInherit Class customControl
     Private Sub SetState(ByVal current As MouseState)
         State = current
         Invalidate()
+    End Sub
+    Protected Overrides Sub OnMouseMove(e As MouseEventArgs)
+        MyBase.OnMouseMove(e)
+        If isdown Then mousedownmove(e)
+    End Sub
+    Protected Overridable Sub mousedownmove(e As MouseEventArgs)
     End Sub
 #End Region
 

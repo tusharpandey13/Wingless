@@ -305,13 +305,13 @@ End Class
 Public Class myListBoxPropertyEditor
     Inherits PropertyEditorBase
 
-    Private WithEvents myform As New Form 'this is the control to be used 
+    Private WithEvents myform As New customColorPicker  'this is the control to be used 
     'in design time DropDown editor
 
     Protected Overrides Function GetEditControl(ByVal PropertyName As String,
       ByVal CurrentValue As Object) As Control
 
-        myform.FormBorderStyle = 0
+        'myform.Color = CurrentValue
 
         Return myform
 
@@ -324,9 +324,8 @@ Public Class myListBoxPropertyEditor
     End Function
 
 
-    Private Sub myTreeView_Click(ByVal sender As Object, ByVal e As _
-                                     System.EventArgs) Handles myform.Click
-        myform.Close()
+    Private Sub myTreeView_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles myform.Click
+        'myform.Close()
     End Sub
 
 End Class
