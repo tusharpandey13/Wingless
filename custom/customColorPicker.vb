@@ -12,12 +12,12 @@ Imports System.Drawing.Drawing2D
     Public Event ColorChanged()
     Private _h! : Public Property h!
         Get
-            Return clamp(_y2, 0, 200) / 200 * 360
+            Return clamp(_y2, 0, 200) * 1.8
         End Get
         Set(value!)
             If DontChange Then Return
             _h = clamp(value, 0, 360)
-            _y2 = clamp(_h / 360 * 200, 0, 200)
+            _y2 = _h / 360 * 200
             ia(0) = 1
             ia(1) = 1
             Invalidate()
@@ -79,6 +79,7 @@ Imports System.Drawing.Drawing2D
         If ia(0) Then
             G.SetClip(rct(0, 0, 200, 200))
             G.Clear(Color.White)
+            'Debug.Write(h)
             Dim l1 As New LinearGradientBrush(rct(0, 0, 200, 200), col(0, 0), hsvtorgb(h, 1, 1), 0)
             Dim l2 As New LinearGradientBrush(rct(l1), col(0, 0), col(0), 90)
             G.FillRectangle(l1, rct(l1))
@@ -175,6 +176,8 @@ Class customColorPicker : Inherits CustomWindow
     Dim dc% = 0
     Dim p As New picker(0, 0, 0, 0)
     Dim t(4) As NumericUpDown
+    Dim l As Label
+    Dim pr As New Panel With {.Top = 200, .Left = 1, .Width = 250, .Height = 45}
     Public Property Color As Color
 #End Region
 
@@ -185,19 +188,28 @@ Class customColorPicker : Inherits CustomWindow
         Controls.Add(p)
         AddHandler p.ColorChanged, AddressOf ColorChangedbypicker
 
+        Dim s() As Char = {"R", "G", "B", "A"}
+
         For i = 1 To 4
-            t(i - 1) = New NumericUpDown With {.TabIndex = i - 1, .Left = 14 * i + 45 * (i - 1), .Top = Height - 40, .BorderStyle = BorderStyle.FixedSingle,
+            t(i - 1) = New NumericUpDown With {.TabIndex = i - 1, .Left = 14 * i + 45 * (i - 1), .Top = 250 + 20, .BorderStyle = BorderStyle.FixedSingle,
                                         .BackColor = col(0), .ForeColor = col(190), .Width = 45, .Font = New Font("Consolas", 10), .Minimum = 0, .Maximum = 255}
             Controls.Add(t(i - 1))
             AddHandler t(i - 1).ValueChanged, AddressOf ColorChangedbytext
         Next
+
+        l = New Label With {.Left = 14, .Top = 250, .ForeColor = col(190), .Font = New Font("Consolas", 10), .Text = "  R      G       B      A", .Width = 250}
+        Controls.Add(l)
+
+
+        Controls.Add(pr)
+        AddHandler pr.Click, AddressOf bye
     End Sub
 
     Sub ColorChangedbypicker()
         dc = 1
         p.DontChange = True
         Color = col(p.a, hsvtorgb(p.h, p.s, p.v))
-        BackColor = col(255, Color)
+        pr.BackColor = col(255, Color)
         t(0).Value = Color.R
         t(1).Value = Color.G
         t(2).Value = Color.B
@@ -209,11 +221,16 @@ Class customColorPicker : Inherits CustomWindow
         If dc = 1 Then Return
         If dc = 0 Then p.DontChange = False
         Color = col(t(3).Value, t(0).Value, t(1).Value, t(2).Value)
+        pr.BackColor = col(255, Color)
         Dim hsv() As Single = rgbtohsv(Color.R, Color.G, Color.B)
         p.h = hsv(0)
         p.s = hsv(1)
         p.v = hsv(2)
         p.a = Color.A
+    End Sub
+
+    Sub bye()
+        Close()
     End Sub
 #Region "Other"
     Protected Overrides Sub create()

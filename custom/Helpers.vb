@@ -122,10 +122,13 @@ Module Helpers
         cmin = Math.Min(Math.Min(rd, gd), bd)
         del = cmax - cmin
 
-        If cmax = rd Then h = 60 * (((gd - bd) / del) Mod 6)
-        If cmax = gd Then h = 60 * ((bd - rd) / del + 2)
-        If cmax = bd Then h = 60 * ((rd - gd) / del + 4)
-
+        If Not del = 0 Then
+            If cmax = rd Then h = 60 * (((gd - bd) / del) Mod 6)
+            If cmax = gd Then h = 60 * ((bd - rd) / del + 2)
+            If cmax = bd Then h = 60 * ((rd - gd) / del + 4)
+        Else
+            h = 0
+        End If
         If cmax = 0 Then s = 0 Else s = del / cmax
 
         v = cmax

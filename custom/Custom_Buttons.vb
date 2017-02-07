@@ -178,19 +178,19 @@ Class custom_Material_Button
     Dim hc As Color = col(0, 0)
     Private w! = 0.0
     Dim iso! = 0
-    Private m_myProperty As String = ""
 
-    'This property uses our custom UITypeEditor: myListBoxPropertyEditor
-    <EditorAttribute(GetType(myListBoxPropertyEditor),
-     GetType(System.Drawing.Design.UITypeEditor))>
-    Public Property myProperty() As String
-        Get
-            Return m_myProperty
-        End Get
-        Set(ByVal value As String)
-            m_myProperty = value
-        End Set
-    End Property
+
+    'Private m_myProperty3 As String
+    ''this property uses our custom UITypeEditor: myFormPropertyEditor
+    '<EditorAttribute(GetType(myFormPropertyEditor), GetType(System.Drawing.Design.UITypeEditor))>
+    'Public Property myProperty3() As String
+    '    Get
+    '        Return m_myProperty3
+    '    End Get
+    '    Set(ByVal value As String)
+    '        m_myProperty3 = value
+    '    End Set
+    'End Property
 
     Private fc As Color = col(100, 0) : <System.ComponentModel.Category("Appearance")> Public Property FloodColor As Color
         Get
@@ -302,31 +302,28 @@ End Class
 
 
 
-Public Class myListBoxPropertyEditor
+Public Class myFormPropertyEditor
     Inherits PropertyEditorBase
 
-    Private WithEvents myform As New customColorPicker  'this is the control to be used 
-    'in design time DropDown editor
+    Private WithEvents myControl As customColorPicker  'this is the control to be used in design time DropDown editor
 
-    Protected Overrides Function GetEditControl(ByVal PropertyName As String,
-      ByVal CurrentValue As Object) As Control
+    Protected Overrides Function GetEditControl(ByVal PropertyName As String, ByVal CurrentValue As Object) As System.Windows.Forms.Control
+        myControl = New customColorPicker()
 
-        'myform.Color = CurrentValue
-
-        Return myform
-
+        Dim num_str As String = CurrentValue
+        Dim str() As String = num_str.Split(",")
+        Dim result(str.Length - 1) As Byte
+        For i = 0 To str.Length - 1
+            result(i) = str(i)
+        Next
+        If CurrentValue IsNot Nothing Then myControl.Color = col(result(0), result(1), result(2), result(3))
+        Return myControl
     End Function
 
-
-    Protected Overrides Function GetEditedValue(ByVal EditControl As Control,
-       ByVal PropertyName As String, ByVal OldValue As Object) As Object
-        Return myform.Text 'return new value for property
+    Protected Overrides Function GetEditedValue(ByVal EditControl As System.Windows.Forms.Control, ByVal PropertyName As String, ByVal OldValue As Object) As Object
+        If myControl Is Nothing Then Return OldValue
+        Return CStr(myControl.Color.A + "," + myControl.Color.R + "," + myControl.Color.G + "," + myControl.Color.B)
     End Function
-
-
-    Private Sub myTreeView_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles myform.Click
-        'myform.Close()
-    End Sub
 
 End Class
 
