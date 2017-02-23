@@ -443,5 +443,4 @@ End Class
 
 
 Partial Interface AnimatedObject
-
 End Interface

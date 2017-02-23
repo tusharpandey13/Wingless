@@ -13,6 +13,11 @@ Public Class CustomWindow : Inherits Form : Implements AnimatedObject
     Dim fxt% = 0
     Dim cbx% = 0
     Dim ms% = 0
+    Public Enum style
+        Original
+        VS
+        Bare
+    End Enum
     Public Property animating As Boolean = 0 Implements AnimatedObject.animating
     Public ReadOnly Property designing As Boolean Implements AnimatedObject.designing
         Get
@@ -29,6 +34,15 @@ Public Class CustomWindow : Inherits Form : Implements AnimatedObject
         End Set
     End Property
     Public Property fordesign As Boolean
+    Private _style As style : Public Property windowstyle As style
+        Get
+            Return _style
+        End Get
+        Set(value As style)
+            _style = value
+            Invalidate()
+        End Set
+    End Property
 #End Region
 
 #Region "DWM"
@@ -143,14 +157,20 @@ Public Class CustomWindow : Inherits Form : Implements AnimatedObject
 #End Region
 
 #Region "VISUALS"
-
-
     Protected Overrides Sub OnPaintBackground(e As PaintEventArgs)
-
-
-
-        'If fxt <> 0 Then closefx()
         Dim g = e.Graphics
+
+        'If windowstyle = style.Original Then draworiginal(g)
+        'If windowstyle = style.VS Then drawvs(g)
+
+        draworiginal(g)
+
+        tp.Dispose() : tb.Dispose()
+
+        paint_(e)
+    End Sub
+
+    Sub draworiginal(g As Graphics)
         Static bc As Color
         Dim d As Boolean = 0
         g.Clear(BackColor) 'prep
@@ -233,11 +253,16 @@ Public Class CustomWindow : Inherits Form : Implements AnimatedObject
         g.TextRenderingHint = 5
         g.DrawString(Text, Font, mb(col(100, 0)), 10, 11)
         g.DrawString(Text, Font, mb(BackColor), 10, 10)
-
-        tp.Dispose() : tb.Dispose()
-
-        paint_(e)
     End Sub
+
+    Sub drawvs(g As Graphics)
+        g.Clear(col(28))
+        g.FillRectangle(mb(col(0, 122, 204)), rct(0, 0, Width, 22))
+        g.DrawRectangle(Pens.Black, rct(0, 0, Width - 1, Height - 1))
+    End Sub
+#End Region
+
+#Region "Events"
     Protected Overrides Sub OnMouseMove(e As MouseEventArgs)
         ms = 1
         MyBase.OnMouseMove(e)
@@ -265,6 +290,7 @@ Public Class CustomWindow : Inherits Form : Implements AnimatedObject
     Private Sub custom_invalidate() Implements AnimatedObject.invalidate
         Invalidate()
     End Sub
+
 #End Region
 
 #Region "FORM LOADING and CLOSING"
@@ -282,6 +308,7 @@ Public Class CustomWindow : Inherits Form : Implements AnimatedObject
 
         If custompaint Then TransparencyKey = Color.Fuchsia
         StartPosition = FormStartPosition.CenterScreen
+        windowstyle = style.Original
         load_()
     End Sub
     Private Sub CustomWindow_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing

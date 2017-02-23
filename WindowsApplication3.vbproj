@@ -73,13 +73,12 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="custom\customColorPicker.vb">
+    <Compile Include="Expt\customColorPicker.vb">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="custom\customContainers.vb">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="custom\BitBliter.vb" />
     <Compile Include="custom\Brag.vb" />
     <Compile Include="custom\Helpers.vb" />
     <Compile Include="custom\customShadow.vb">
@@ -104,7 +103,7 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="custom\Interpolation.vb" />
-    <Compile Include="custom\propertyeditorbase.vb" />
+    <Compile Include="Expt\propertyeditorbase.vb" />
     <Compile Include="custom\Themebase.vb">
       <SubType>Component</SubType>
     </Compile>

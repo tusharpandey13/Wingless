@@ -192,7 +192,7 @@ Class customColorPicker : Inherits CustomWindow
 
         For i = 1 To 4
             t(i - 1) = New NumericUpDown With {.TabIndex = i - 1, .Left = 14 * i + 45 * (i - 1), .Top = 250 + 20, .BorderStyle = BorderStyle.FixedSingle,
-                                        .BackColor = col(0), .ForeColor = col(190), .Width = 45, .Font = New Font("Consolas", 10), .Minimum = 0, .Maximum = 255}
+                                        .BackColor = col(51), .ForeColor = col(190), .Width = 45, .Font = New Font("Consolas", 10), .Minimum = 0, .Maximum = 255}
             Controls.Add(t(i - 1))
             AddHandler t(i - 1).ValueChanged, AddressOf ColorChangedbytext
         Next
