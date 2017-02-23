@@ -16,11 +16,12 @@ Imports System.Drawing.Drawing2D
         End Get
         Set(value!)
             If DontChange Then Return
-            _h = clamp(value, 0, 360)
-            _y2 = _h / 360 * 200
+            _h = value
+            _y2 = clamp(value, 0, 360) / 360 * 200
             ia(0) = 1
             ia(1) = 1
             Invalidate()
+            Debug.WriteLine("p"+cstr(_h))
         End Set
     End Property
     Private _s! : Public Property s!
@@ -67,7 +68,7 @@ Imports System.Drawing.Drawing2D
         Me.s = s
         Me.v = v
         Me.a = a
-        Left = 1 : Top = 1
+        Left = 0 : Top = 0
         Width = 250 : Height = 200
     End Sub
 #End Region
@@ -144,6 +145,10 @@ Imports System.Drawing.Drawing2D
     End Sub
 #End Region
 #Region "INPUT"
+    Protected Overrides Sub OnClick(e As EventArgs)
+        MyBase.OnClick(e)
+        mousedownmove(e)
+    End Sub
     Protected Overrides Sub mousedownmove(e As MouseEventArgs)
         MyBase.mousedownmove(e)
         If Not (e.Y > -1 Or e.Y < 211) Then Return
@@ -177,7 +182,7 @@ Class customColorPicker : Inherits CustomWindow
     Dim p As New picker(0, 0, 0, 0)
     Dim t(4) As NumericUpDown
     Dim l As Label
-    Dim pr As New Panel With {.Top = 200, .Left = 1, .Width = 250, .Height = 45}
+    Dim pr As New Panel With {.Top = 200, .Left = 0, .Width = 250, .Height = 45}
     Public Property Color As Color
 #End Region
 
@@ -219,7 +224,7 @@ Class customColorPicker : Inherits CustomWindow
     End Sub
     Sub ColorChangedbytext()
         If dc = 1 Then Return
-        If dc = 0 Then p.DontChange = False
+        p.DontChange = False
         Color = col(t(3).Value, t(0).Value, t(1).Value, t(2).Value)
         pr.BackColor = col(255, Color)
         Dim hsv() As Single = rgbtohsv(Color.R, Color.G, Color.B)
@@ -236,7 +241,7 @@ Class customColorPicker : Inherits CustomWindow
     Protected Overrides Sub create()
         MyBase.create()
         BackColor = col(51)
-        SetWindowPos(Handle, vbNull, Cursor.Position.X - 240, Cursor.Position.Y - 240, 252, 302, SetWindowPosFlags.FrameChanged)
+        SetWindowPos(Handle, vbNull, Cursor.Position.X - 240, Cursor.Position.Y - 240, 250, 302, SetWindowPosFlags.FrameChanged)
     End Sub
 #End Region
 End Class

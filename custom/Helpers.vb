@@ -133,6 +133,8 @@ Module Helpers
 
         v = cmax
 
+        If h < 0 Then h = 360 + h   'bug where h becomes -ve
+
         Return {h, s, v}
     End Function
 #End Region
